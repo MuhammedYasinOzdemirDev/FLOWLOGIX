@@ -169,3 +169,14 @@
 - **Event evrimi:** Zorunlu tutarlılık önce aynı transaction; bağımsız yan etki process içi event; dayanıklı dış teslimat outbox; bağımsız tüketici/ölçek broker; bağımsız deployment ve veri sahipliği kanıtlanırsa mikroservis.
 - **Fiziksel proje ayrımı:** İlgili modülün domain karmaşıklığı veya framework ihlali kanıtlanırsa yalnız o modül ayrıca ayrılabilir; bütün modüller simetri için zorla aynı proje sayısına çıkarılmaz.
 - **Araştırma:** `docs/RESEARCH.md` içindeki R-011.
+
+## D-018 — CI ve aşamalı statik analiz
+
+- **Tarih:** 2026-06-29
+- **Durum:** GitHub Actions kabul edildi; SonarQube Cloud aktivasyonu kullanıcı onayı/account işlemi bekliyor
+- **CI kararı:** Frontend scaffold ve lockfile sonrası, local backend/frontend komutlarını `pull_request` ve `main` push üzerinde çalıştıran GitHub Actions workflow'u eklenecek.
+- **Güvenlik:** Workflow varsayılan read-only permission kullanacak, `pull_request_target` kullanmayacak, third-party action'lar doğrulanmış full commit SHA ile pinlenecek ve secret tracked dosyaya yazılmayacak.
+- **Sonar önerisi:** Public FlowLogix repository için self-hosted SonarQube Server yerine SonarQube Cloud Free kullanılacak; server/DB/backup/upgrade işletim yükü alınmayacak.
+- **Uyumluluk:** TypeScript 6 kararlı kalacak. Sonar resmi desteği TS6'yı kapsayana kadar ilk analiz C# ile sınırlandırılacak; analiz aracı uğruna frontend 5.9'a düşürülmeyecek.
+- **Coverage:** Gerçek testler oluşmadan coverage quality gate bloklaması yapılmayacak. Coverage üretimi Sonar'ın işi değildir; uygun test aracıyla rapor üretildikten sonra import edilecek.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-012.

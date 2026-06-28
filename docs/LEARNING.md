@@ -117,3 +117,12 @@ FLOW-001 source adımında:
 - **Mimari etkisi:** API modülün DbContext, handler veya endpoint sınıflarını bilmez; yalnız public composition contract'ı çağırır.
 - **Doğrulama:** API → Identity/Customers yönü korunarak solution temiz derlendi; process startup, OpenAPI ve Problem Details HTTP üzerinden çalıştı.
 - **Yaygın hata:** Servis kaydını yapmakla HTTP endpointinin otomatik olarak eşlendiğini sanmak veya modülün iç kayıtlarını `Program.cs` içine tek tek taşımak.
+
+## L-016 — CI, statik analiz ve coverage aynı kalite sinyali değildir
+
+- **Bağlam:** FLOW-001.10–11 GitHub Actions/Sonar araştırması
+- **CI öğrenimi:** GitHub Actions yereldeki deterministik restore/build/test/lint komutlarını temiz runner'da tekrarlar; çalışması kodun doğru iş kuralını kapsadığını tek başına kanıtlamaz.
+- **Analiz öğrenimi:** Sonar statik code-quality/security sorunlarını inceler; test coverage raporunu kendisi üretmez.
+- **Güvenlik öğrenimi:** Workflow token'ı least privilege olmalı, secrets repository'ye yazılmamalı ve action tag yerine full commit SHA pinlemek immutable dependency sağlar.
+- **Uyumluluk öğrenimi:** Uygulama derleyicisiyle analiz aracının destek matrisi farklı olabilir. Kararlı TypeScript 6'yı seçmek, Sonar'ın o dili henüz tam desteklediği anlamına gelmez.
+- **Yaygın hata:** Boş veya değersiz testlerle yüksek coverage üretmek, quality gate'i kalite kanıtı sanmak ya da public repo için gereksiz self-hosted analiz sunucusu işletmek.

@@ -557,3 +557,65 @@ Bu sıra modüler monolith'i “atılacak geçici kod” yapmaz. Bugün kurulan 
 - [Microsoft — Integration events and eventual consistency](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/integration-event-based-microservice-communications)
 - [Microsoft — Azure architecture styles and microservices trade-offs](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/)
 - [Microsoft — Identify microservice boundaries](https://learn.microsoft.com/en-us/azure/architecture/microservices/model/microservice-boundaries)
+
+## R-012 — GitHub Actions, SonarQube ve kalite kapısı stratejisi
+
+**Tarih:** 2026-06-29  
+**Durum:** Tamamlandı
+
+FlowLogix repository'sinin GitHub API üzerinden public olduğu doğrulandı. Amaç, yerelde kullanılan restore/build/test/frontend komutlarını güvenli ve tekrarlanabilir bir remote kapıya taşımak; statik analizi gerçek test kapsamı veya dil uyumluluğu varmış gibi göstermemektir.
+
+### Seçenek karşılaştırması
+
+| Seçenek | Sağladığı değer | Maliyet/risk | Sonuç |
+|---|---|---|---|
+| GitHub Actions | PR ve `main` push üzerinde build/test/lint doğrulaması | Workflow ve action sürüm bakımı | FLOW-001 kapsamında zorunlu |
+| SonarQube Cloud Free | C#/JS/TS code quality, security analizi ve quality gate; public repo için sunucu bakımı yok | GitHub bağlantısı ve `SONAR_TOKEN`; Free plan branch/PR özellikleri sınırlı | Önerildi |
+| Self-hosted SonarQube Server | Veri ve sunucu kontrolü | Sunucu, DB, upgrade, backup, TLS ve erişim güvenliği yükü | Tek geliştirici/public repo için reddedildi |
+| GitHub CodeQL | GitHub-native güvenlik/code scanning | Sonar ile kısmi örtüşme; code-quality odağı daha dar | İleride güvenlik ihtiyacında tamamlayıcı |
+| Yalnız .NET analyzer/ESLint | Hızlı, local ve secretsız | Cross-language dashboard/quality gate yok | CI'nın temel katmanı; Sonar'ın yerine değil önünde |
+
+SonarQube Cloud Free plan public projeleri destekler ve private projelerde toplam 50k LOC sınırı sunar. FlowLogix public olduğu için ücretli ya da self-hosted sunucu bugün gerekmez. Sonar bağlantısı dış hizmet/account işlemi olduğu için repository import'u ve secret oluşturma kullanıcı tarafından yapılmalıdır.
+
+### GitHub Actions tasarım sınırı
+
+- Workflow frontend scaffold ve lockfile oluştuktan sonra yazılacak; yarım workflow commit edilmeyecek.
+- Tetikleyiciler `pull_request` ve yalnız `main` push olacak; `pull_request_target` kullanılmayacak.
+- `permissions: contents: read` varsayılanı kullanılacak; workflow repository'ye yazmayacak.
+- `actions/checkout` ve setup action'ları mümkünse doğrulanmış full commit SHA'ya pinlenecek; okunabilirlik için yanına sürüm yorumu yazılacak.
+- `global.json` içindeki .NET `10.0.301` politikası kullanılacak. GitHub'ın güncel hatları `actions/checkout@v6` ve `actions/setup-dotnet@v5`tir; gerçek SHA workflow yazılırken resmi repository'den tekrar doğrulanacak.
+- Backend kapısı `restore → Release build --no-restore → test --no-build --no-restore`; frontend kapısı `npm ci → lint → test → build` olacak.
+- NuGet cache, `packages.lock.json` oluşmadan açılmayacak. Küçük dependency graph'ta cache'in faydası ölçülmeden ek karmaşıklık oluşturulmayacak.
+- `concurrency` ile aynı branch/PR'ın eski koşusu iptal edilecek.
+- Gerçek SQL Server integration testleri başladığında GitHub-hosted runner üzerinde SQL Server service/container stratejisi ayrıca doğrulanacak; bugünkü iki boş keşif testi SQL entegrasyonu sayılmayacak.
+- İlk başarılı remote koşu görülmeden branch protection/required check adı sabitlenmeyecek.
+
+### SonarQube Cloud aşamalı kurulum
+
+1. Kullanıcı GitHub hesabıyla SonarQube Cloud organization/project oluşturur veya public repository'yi import eder.
+2. Üretilen token GitHub repository secret olarak yalnız `SONAR_TOKEN` adıyla saklanır; YAML veya appsettings'e yazılmaz.
+3. SonarScanner for .NET repository local tool manifest'inde exact sürüme sabitlenir.
+4. CI-based analiz `begin → restore/build/test → end` sırasını kullanır ve checkout geçmişi analiz için tam alınır.
+5. Quality gate başlangıçta analiz görünürlüğü sağlar; iki boş şablon testinden coverage hedefi türetilmez.
+6. Gerçek unit/integration testleri oluştuğunda `dotnet-coverage` veya Coverlet karşılaştırılır, coverage raporu üretilip Sonar'a import edilir.
+
+### TypeScript 6 uyumluluk kapısı
+
+TypeScript `6.0.3` güncel kararlı sürümdür. Buna karşılık SonarQube Cloud'un 2026-06-29 tarihli JavaScript/TypeScript dokümanı tam desteği `5.9.3`e kadar bildirir. TypeScript 6, Microsoft tarafından 5.9 ile API uyumlu bir geçiş sürümü olarak tanımlansa da bu Sonar desteğini varsaymak için yeterli değildir.
+
+Öneri: FlowLogix'i yalnız analiz aracı geride kaldığı için TypeScript 5.9'a düşürmemek. İlk Sonar adımında `sonar.scanner.scanAll=false` ile C# kapsamını güvenilir tutmak; Sonar TypeScript 6 desteği açıkça doğrulandığında multi-language taramayı ve frontend coverage'ını etkinleştirmek. Yarınki frontend sürüm kararı bu uyumluluk notuyla birlikte tekrar değerlendirilecek.
+
+### Kaynaklar
+
+- [GitHub — Building and testing .NET](https://docs.github.com/en/actions/tutorials/build-and-test-code/net)
+- [GitHub — Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub — `actions/checkout`](https://github.com/actions/checkout)
+- [GitHub — `actions/setup-dotnet`](https://github.com/actions/setup-dotnet)
+- [GitHub — Dependabot version updates](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-version-updates)
+- [Sonar — SonarQube Cloud subscription plans](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/subscription-plans)
+- [Sonar — GitHub Actions CI-based analysis](https://docs.sonarsource.com/sonarcloud/advanced-setup/ci-based-analysis/github-actions-for-sonarcloud)
+- [Sonar — SonarScanner for .NET configuration and multi-language analysis](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/ci-based-analysis/sonarscanner-for-dotnet/configuring)
+- [Sonar — .NET test coverage](https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/dotnet-test-coverage)
+- [Sonar — JavaScript/TypeScript/CSS support](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/languages/javascript-typescript-css)
+- [Microsoft — Announcing TypeScript 6.0](https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/)
+- [npm — TypeScript](https://www.npmjs.com/package/typescript)

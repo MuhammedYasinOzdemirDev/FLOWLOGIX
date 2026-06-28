@@ -6,7 +6,7 @@
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
 - **Aktif alt task:** FLOW-001.8a — Frontend sürüm ve Node uyumluluğu araştırması
 - **Branch:** `feature/FLOW-001-foundation`
-- **Son doğrulanan commit:** `e0390907f6db8f8a1aeae0d691b59edab42abc10` — Initial commit
+- **Son doğrulanan kaynak commit:** `7c650ce` — `feat(api): establish modular backend foundation`
 
 ## Mevcut repository yapısı
 
@@ -85,6 +85,12 @@
 - FLOW-001.7g.4, FLOW-001.7g.5 ve backend iskelet FLOW-001.7 tamamlandı.
 - Kullanıcı mevcut değişiklikleri Conventional Commits ile mantıksal gruplar hâlinde commit etme yetkisi verdi; push/merge yetkisi vermedi.
 - `origin` remote'u `MuhammedYasinOzdemirDev/FLOWLOGIX` olarak doğrulandı; GitHub CLI makinede kurulu olmadığı için CLI authentication kontrolü yapılamadı.
+- Conventional Commits ile `01a0d29 docs: establish FlowLogix project guidance`, `8c2345b build: configure repository tooling` ve `7c650ce feat(api): establish modular backend foundation` commitleri oluşturuldu.
+- Son source commit öncesi whitespace kontrolü, solution build ve test tekrar geçti; 5 proje `0` uyarı/`0` hata ve `2/2` geçici test başarılı.
+- GitHub API repository'nin public, default branch'in `main` olduğunu doğruladı; push yapılmadı.
+- GitHub Actions, SonarQube Cloud/Server, CodeQL, action pinning, secret, coverage ve TypeScript uyumluluğu R-012'de araştırıldı.
+- Frontend local kapısı yeşil olduktan sonra read-only GitHub Actions CI kurulmasına; kullanıcı dış hizmet aktivasyonunu onaylarsa public repo için SonarQube Cloud Free kullanılmasına karar verildi.
+- TypeScript `6.0.3` kararlı olmasına rağmen Sonar'ın resmi tam desteği `5.9.3`te kaldığı için ilk Sonar taramasının C# ile sınırlandırılması ve frontend analizinin destek kapısında açılması kaydedildi.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
 
@@ -113,12 +119,15 @@
 
 ## Açık durum ve riskler
 
-- Repository'deki yeni solution, source, test ve doküman dosyaları henüz untracked; commit için kullanıcı onayı verilmedi.
+- Yerel branch'te üç mantıksal commit oluşturuldu; GitHub'a push edilmedi.
 - `.vs/` ignore kuralı kullanıcı tarafından eklendi ve doğrulandı.
 - İki `Test1.cs` yalnız MTP keşif altyapısını doğrulayan geçici şablon testidir; gerçek domain/integration kapsamı gibi sayılmamalı ve ilk gerçek testlerle değiştirilmelidir.
 - React/Vite frontend henüz oluşturulmadı.
 - SQL Server bağlantı biçimi ve development database adı source adımında doğrulanmalı; secret repository'ye yazılmamalı.
 - Paket exact sürümleri kurulum anında resmi kaynak/NuGet/npm üzerinden tekrar doğrulanmalı.
+- GitHub CLI makinede kurulu değil; remote API erişimi mevcut, ancak CLI ile auth/secret/push işlemi yapılamıyor.
+- SonarQube Cloud project import ve `SONAR_TOKEN` oluşturma dış hizmet işlemi olduğundan kullanıcı tarafından yapılmalı.
+- SonarQube Cloud resmi TypeScript tam desteği `5.9.3`; FlowLogix TypeScript 6 frontend analizi açılmadan yeniden doğrulanmalı.
 - Word belgesinin görsel render kontrolü ortamda LibreOffice bulunmadığı için yapılamadı; içerik OOXML ve metin/tablo çıkarımıyla okundu.
 
 ## Alınan kararlar
