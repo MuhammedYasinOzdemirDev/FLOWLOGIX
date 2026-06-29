@@ -17,7 +17,8 @@ Karar ve doğrulama sırası:
 
 - Kaynak kodunu kullanıcı yazar.
 - Agent gerekli kodu tam dosya yolu, bağımlılıklar ve açıklamalarla verir.
-- Agent yalnız açıkça izin verilen belirli ve mekanik frontend taskında kod değiştirebilir.
+- Agent, önce amacını ve tam değişikliği anlattığı mekanik frontend tooling/config dosyalarını kullanıcının verdiği sınırlı yetkiyle doğrudan değiştirebilir.
+- Bu yetki React uygulama/ürün kodunu, backend/domain kodunu, migration'ı veya ürün davranışını kapsamaz; bu alanlarda task-bazlı açık izin gerekir.
 - Agent yaşayan Markdown belgelerini oluşturup güncelleyebilir.
 - Kullanıcının değişiklikleri geri alınmaz.
 
@@ -51,6 +52,10 @@ Her kaynak kod adımı şu sırayı izler:
 
 - Modüler monolith başlangıç tercihidir; modül veri sahipliği korunur.
 - Controller/endpoint ve React bileşenlerine domain kuralı dağıtılmaz.
+- Frontend iş kabiliyetine göre dikey dilimlenir: uygulama composition'ı `app`, iş akışları `features`, gerçekten ortak teknik parçalar `shared` altında tutulur; kullanılmayan boş klasörler oluşturulmaz.
+- Frontend state'inin tek sahibi olur: URL durumu Router, uzak API verisi TanStack Query, geçici ekran/form durumu React state; aynı veri ikinci bir state alanına kopyalanmaz.
+- API çağrıları bileşenlere ve `useEffect` bloklarına dağıtılmaz; ortak HTTP politikası tipli API istemcisinde, iş endpointleri ilgili feature içinde tutulur.
+- React bileşenleri ve hook'ları saf tutulur; state/props değiştirilmez, hook'lar koşullu çağrılmaz ve ölçülmüş ihtiyaç olmadan memoization eklenmez.
 - API modeli, domain modeli ve persistence ihtiyacı otomatik olarak tek sınıf yapılmaz.
 - Generic repository, MediatR, CQRS, broker, Redis, Dapper, Hangfire, SignalR veya Aspire somut ihtiyaç olmadan eklenmez.
 - Nullable reference types, async/await, cancellation, DI, Options, structured logging ve güvenli configuration uygulanır.
@@ -71,6 +76,9 @@ Her kaynak kod adımı şu sırayı izler:
 - Conventional Commit mesajları önerilir.
 - Agent kullanıcı istemeden Git durumunu değiştiren komut çalıştırmaz.
 - `docs/` proje hafızasıdır ve version control dışında bırakılmaz.
+- Commitler dosya uzantısına göre değil tek bir değişiklik niyetine göre gruplanır; docs, build/tooling ve ürün davranışı gerekçesiz biçimde karıştırılmaz.
+- Commit başlığı ne değiştiğini, gerektiğinde gövdesi nedenini, ana kapsamı ve çalıştırılan doğrulamayı açıklar.
+- Commitler mümkün olduğunca bağımsız anlaşılır ve doğrulanabilir olur; yapay mikro-commit veya çok farklı işleri yutan dev commit oluşturulmaz.
 
 ## 8. Context küçülmesi ve proje hafızası
 
