@@ -38,11 +38,40 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
     - [x] FLOW-001.7g.5 — Public yüzey, dependency graph, build ve runtime davranışını doğrula
   - [x] FLOW-001.7h — Development OpenAPI ve ortak Problem Details pipeline temelini kur ve HTTP üzerinden doğrula
 - [ ] FLOW-001.8 — React/Vite proje iskeletini kullanıcı oluştursun
-  - [ ] FLOW-001.8a — Güncel React/Vite/TypeScript/Router/Query sürüm ve Node uyumluluğunu doğrula
-  - [ ] FLOW-001.8b — Vite React/TypeScript iskeletini `src/FlowLogix.Web` altında oluştur
-  - [ ] FLOW-001.8c — Router ve Query bağımlılıklarını exact sürümlerle ekle
-  - [ ] FLOW-001.8d — Script, TypeScript, ESLint ve Vite config'lerini repository politikasıyla doğrula
-  - [ ] FLOW-001.8e — Başlangıç şablonunu FlowLogix uygulama kabuğuna indirgeme planını belirle
+  - [x] FLOW-001.8a — Güncel React/Vite/TypeScript/Router/Query/test sürüm, lisans ve Node uyumluluğunu doğrula
+  - [x] FLOW-001.8b — Vite React/TypeScript iskeletini `src/FlowLogix.Web` altında oluştur
+  - [x] FLOW-001.8c — Router ve Query bağımlılıklarını exact sürümlerle ekle
+  - [x] FLOW-001.8d — Node/npm pin'i ile script, TypeScript, ESLint, Vitest, formatter ve Vite config'lerini repository politikasıyla doğrula
+    - [x] FLOW-001.8d.1 — Node/npm sürüm sözleşmesini ve direct dependency sürüm politikasını tanımla
+    - [x] FLOW-001.8d.2 — Vitest, Testing Library ve jsdom bağımlılıklarıyla gerçek `test` script'ini kur
+      - [x] FLOW-001.8d.2a — Exact test dependency'lerini ekle
+      - [x] FLOW-001.8d.2b — Vitest jsdom/setup ve test script'lerini yapılandır
+      - [x] FLOW-001.8d.2c — İlk kullanıcı davranışı odaklı component testini yaz ve çalıştır
+    - [x] FLOW-001.8d.3 — React/Query/test ESLint kurallarını ve TypeScript lint sınırını doğrula
+      - [x] FLOW-001.8d.3a — Query ve Testing Library ESLint plugin'lerini exact sürümle ekle
+      - [x] FLOW-001.8d.3b — Type-aware lint ile Query recommended ve test-scoped React kurallarını yapılandır
+      - [x] FLOW-001.8d.3c — Lint performansını ve mevcut kaynak/test uyumluluğunu doğrula
+    - [x] FLOW-001.8d.4 — Vite ve TypeScript config'lerini uygulama/CI ihtiyaçlarıyla doğrula
+      - [x] FLOW-001.8d.4a — TypeScript strict ve ek güvenlik kurallarını belirle
+      - [x] FLOW-001.8d.4b — Same-origin geliştirme için Vite `/api` proxy politikasını kur
+        - [x] FLOW-001.8d.4b.1 — Trusted development certificate ve npm Node system-CA politikasını doğrula
+        - [x] FLOW-001.8d.4b.2 — Vite `/api` HTTPS proxy ayarını ekle
+      - [x] FLOW-001.8d.4c — Test/lint/build ve gerçek proxy davranışını doğrula
+    - [x] FLOW-001.8d.5 — Prettier ile tekrarlanabilir frontend format kapısını kur
+      - [x] FLOW-001.8d.5a — Formatter alternatiflerini araştır; exact Prettier dependency, config, ignore ve npm script'lerini ekle
+      - [x] FLOW-001.8d.5b — Kullanıcı ilk format taban çizgisini kaynak dosyalara uygulasın
+      - [x] FLOW-001.8d.5c — Format check, lint, test ve production build kapılarını birlikte doğrula
+  - [x] FLOW-001.8e — Frontend state sahipliği, feature mimarisi, React yazım kuralları ve fetch/Axios kararını belirle
+  - [ ] FLOW-001.8e.1 — Başlangıç şablonunu boş klasör oluşturmadan FlowLogix uygulama kabuğuna indirgeme planını uygula
+    - [x] FLOW-001.8e.1a — ERP arayüzü için styling/component seçeneklerini karşılaştır ve UI temelini seç
+      - [x] FLOW-001.8e.1a.1 — FlowLogix'e özgü Operasyon Kontrol Kulesi görsel/etkileşim dilini ve ek kütüphane kapılarını belirle
+    - [x] FLOW-001.8e.1b — MUI core ve Emotion dependency'lerini exact sürümle ekle
+    - [ ] FLOW-001.8e.1c — Theme, CssBaseline, QueryClient ve BrowserRouter provider composition'ını kur
+      - [x] FLOW-001.8e.1c.1 — FlowLogix theme token'larını ve MUI component default'larını tanımla
+      - [x] FLOW-001.8e.1c.2 — QueryClient ve root AppProviders composition'ını oluştur
+      - [ ] FLOW-001.8e.1c.3 — React bootstrap'ı AppProviders üzerinden bağla
+    - [ ] FLOW-001.8e.1d — İlk gerçek route/layout kabuğunu kur ve Vite demo asset'lerini kaldır
+    - [ ] FLOW-001.8e.1e — Geçici demo testini uygulama kabuğu davranış testiyle değiştir
   - [ ] FLOW-001.8f — Clean install, lint, test ve production build kapılarını doğrula
 - [ ] FLOW-001.9 — Restore/build sonuçlarını agent doğrulasın
 - [ ] FLOW-001.10 — Frontend yerel kapısı da yeşil olduktan sonra GitHub Actions CI akışını ekle

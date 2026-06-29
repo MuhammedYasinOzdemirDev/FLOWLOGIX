@@ -434,7 +434,7 @@ Bu seçim test kapsamını değiştirmez:
 
 ## R-010 — Modül endpoint sahipliği ve ASP.NET Core framework reference
 
-**Tarih:** 2026-06-29  
+**Tarih:** 2026-06-29
 **Durum:** Tamamlandı
 
 FlowLogix'in onaylanan yapısında her modül tek assembly içinde `Domain`, `Features`, `Infrastructure` ve `Endpoints` alanlarını taşır. Bu nedenle endpoint adapter'ları ve service-registration extension'ları ASP.NET Core API'lerine erişmek zorundadır.
@@ -619,3 +619,349 @@ TypeScript `6.0.3` güncel kararlı sürümdür. Buna karşılık SonarQube Clou
 - [Sonar — JavaScript/TypeScript/CSS support](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/languages/javascript-typescript-css)
 - [Microsoft — Announcing TypeScript 6.0](https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/)
 - [npm — TypeScript](https://www.npmjs.com/package/typescript)
+
+## R-013 — Frontend foundation sürüm ve araç seçimi
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+FlowLogix frontend'i aynı origin ASP.NET Core API'yi kullanan, server-state ağırlıklı bir operasyon SPA'sıdır. Bu nedenle SSR/full-stack React framework'ü yerine Vite SPA; route için React Router; API cache/senkronizasyonu için TanStack Query seçildi. Paket metadata'sı npm registry'den `strict-ssl=true` korunarak doğrulandı.
+
+### Seçilen başlangıç matrisi
+
+| Araç | Exact doğrulanan sürüm | Rol | Engine/peer sonucu | Lisans |
+|---|---:|---|---|---|
+| Node.js | `24.16.0` | Yerel/CI JavaScript runtime | Bütün seçilen araçların koşullarını karşılıyor | Node.js lisansı |
+| npm | `11.13.0` | Paket yöneticisi/lockfile | Node 24 ile mevcut ortamda çalışıyor | Artistic-2.0 |
+| create-vite | `9.1.0` | Bir defalık resmi scaffold | Node `^20.19 || >=22.12` | MIT |
+| Vite | `8.1.0` | Dev server ve production build | Node `^20.19 || >=22.12` | MIT |
+| `@vitejs/plugin-react` | `6.0.3` | React Fast Refresh/JSX entegrasyonu | Vite `^8`; React Compiler peer'ı opsiyonel | MIT |
+| React / React DOM | `19.2.7` | UI runtime/DOM renderer | Birbiriyle exact uyumlu | MIT |
+| TypeScript | `6.0.3` | Static type checking | Node `>=14.17` | Apache-2.0 |
+| React Router | `8.0.1` | Browser route ve protected-route kabuğu | Node `>=22.22`, React/DOM `>=19.2.7` | MIT |
+| TanStack Query | `5.101.2` | Server-state cache, request/mutation durumu | React `^18 || ^19` | MIT |
+| Vitest | `4.1.9` | Vite-native unit/component test runner | Node 24 ve Vite 8 destekli | MIT |
+| Testing Library React | `16.3.2` | Kullanıcı davranışı odaklı component testleri | React 18/19 | MIT |
+| Testing Library DOM | `10.4.1` | Semantic DOM query ve assertion tabanı; React paketinin peer dependency'si | Node `>=18` | MIT |
+| Testing Library user-event | `14.6.1` | Gerçekçi click/type/focus kullanıcı etkileşimi | Testing Library DOM ekosistemi | MIT |
+| Testing Library jest-dom | `6.9.1` | DOM assertion'ları | Node `>=14` | MIT |
+| jsdom | `29.1.1` | Vitest için browser DOM simülasyonu | Node `>=24` destekli | MIT |
+| ESLint | `10.6.0` | JavaScript/TypeScript lint | Node 24 destekli | MIT |
+| typescript-eslint | `8.62.0` | ESLint TypeScript parser/rules | ESLint 8/9/10, TypeScript `<6.1` | MIT |
+| TanStack Query ESLint plugin | `5.101.2` | Query kullanım hatalarını yakalama | ESLint 8/9/10, TypeScript 5.4/6 | MIT |
+
+`@types/react 19.2.17` ve `@types/react-dom 19.2.3` TypeScript 6 etiketlerini ve React 19 tiplerini destekler.
+
+### React Router 7 → 8 karar değişikliği
+
+Önceki plan React Router 7 hattını hedefliyordu. Araştırma gününde `react-router@8.0.1` kararlı sürüm olmuştu. İki seçenek karşılaştırıldı:
+
+| Seçenek | Artı | Eksi | Sonuç |
+|---|---|---|---|
+| `react-router@7.18.0` | Daha uzun saha süresi; Vite 8 ve TS6 desteği mevcut | Yeni projede yakın major geçişi ve eski minimum baseline | Geçerli fakat seçilmedi |
+| `react-router@8.0.1` | Node 24 + React 19.2.7 + Vite 8 tabanımızla tam hizalı; yeni projede migration borcu yok | Çok yeni major; paket tabanı ayrıca izlenmeli | Seçildi |
+
+v8 minimumları Node `22.22+`, React/DOM `19.2.7+` ve Vite `7+`tır. FlowLogix bunları karşılar. v8'de eski `react-router-dom` paketi kaldırılmıştır; yeni kod resmi `react-router` paketinden import yapacak. FlowLogix **Declarative Mode** ile `<BrowserRouter>` kullanacak; React Router Framework Mode veri yükleme/SSR sorumluluğu almayacak. Server state TanStack Query'de, backend ise ASP.NET Core'da kalacak.
+
+### Bilinçli başlangıç sınırları
+
+- Resmi `react-ts` template kullanılacak; `react-compiler-ts` seçilmeyecek. React Compiler peer dependency'si opsiyoneldir ve henüz ölçülmüş ihtiyaç yoktur.
+- Redux/Zustand eklenmeyecek. Auth/session ve Customer verisi server state olarak Query ile; küçük UI state'i React state/context ile ele alınacak.
+- Axios eklenmeyecek; başlangıçta same-origin `fetch` wrapper yeterlidir.
+- React Hook Form benzeri form kütüphanesi ilk basit form görülmeden eklenmeyecek.
+- React Router Data/Framework Mode ile TanStack Query aynı veri sahipliği problemine bindirilmeyecek.
+- Vitest template tarafından gelmediği için ayrı küçük adımda kurulacak; yalnız build veren fakat `npm test` script'i olmayan foundation tamamlanmış sayılmayacak.
+- Direct dependency sürümleri `package-lock.json` ile exact çözümlenecek; CI yalnız `npm ci` kullanacak.
+
+### Node ve TLS ortam notu
+
+Yerel ilk `npm view` çağrısı `UNABLE_TO_VERIFY_LEAF_SIGNATURE` verdi. `strict-ssl=false` reddedildi. Node 24'ün Windows güvenilir kök deposunu kullanan process-level `NODE_OPTIONS=--use-system-ca` ayarıyla, `strict-ssl=true` korunarak registry erişimi başarıyla doğrulandı.
+
+Frontend scaffold/install komutları bu oturum ayarıyla çalıştırılacak. Repository'ye kurumsal CA dosyası veya TLS bypass ayarı yazılmayacak. Node `24.16.0` ve npm `11.13.0` frontend config/CI aşamasında açıkça pinlenecek.
+
+### Sonar uyumluluk notu
+
+TypeScript `6.0.3` kararlı ve seçilen lint/type paketleriyle uyumludur. SonarQube Cloud'un tam TypeScript desteği henüz `5.9.3`te kaldığı için R-012'deki C#-önce analiz kapısı korunur; frontend sürümü Sonar uğruna düşürülmez.
+
+### Kaynaklar
+
+- [React — Versions](https://react.dev/versions)
+- [npm — React](https://www.npmjs.com/package/react)
+- [Vite — Getting Started](https://vite.dev/guide/)
+- [Vite — Announcing Vite 8](https://vite.dev/blog/announcing-vite8)
+- [npm — create-vite](https://www.npmjs.com/package/create-vite)
+- [React Router — Declarative installation](https://reactrouter.com/start/declarative/installation)
+- [React Router — v8 changelog](https://reactrouter.com/start/start/changelog)
+- [npm — React Router](https://www.npmjs.com/package/react-router)
+- [TanStack Query — Installation](https://tanstack.com/query/v5/docs/framework/react/installation)
+- [npm — TanStack Query](https://www.npmjs.com/package/%40tanstack/react-query)
+- [Microsoft — TypeScript 6.0](https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/)
+- [npm — Vitest](https://www.npmjs.com/package/vitest)
+
+## R-014 — Frontend mimarisi ve HTTP istemcisi
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+FlowLogix ekranları yalnız görsel sayfalardan oluşmayacak; oturum, yetki, arama/sayfalama, mutation, standart hata ve antiforgery davranışlarını tutarlı biçimde taşıyacak. Bu nedenle başlangıç mimarisi teknoloji türlerine göre yatay klasörler yerine iş kabiliyetlerine göre dikey dilimler kullanacak.
+
+### Önerilen sınırlar
+
+```text
+src/
+  app/                 # bootstrap, provider, router ve ana layout composition'ı
+  features/
+    auth/              # auth API, hook, component ve route parçaları
+    customers/         # customer API, hook, component ve route parçaları
+  shared/
+    api/               # HTTP policy, Problem Details ve ApiError
+    ui/                # ancak gerçekten tekrar kullanılan sunum parçaları
+    lib/               # iş/domain bilmeyen küçük teknik yardımcılar
+```
+
+Klasörler scaffold anında boş olarak topluca oluşturulmayacak; ilk gerçek dosyayla birlikte açılacak. Route bileşeni akışı düzenler, feature bileşeni kullanıcı etkileşimini sunar, backend iş kurallarının otoritesi olmaya devam eder.
+
+### State sahipliği
+
+| Veri türü | Sahibi | Neden |
+|---|---|---|
+| Sayfa, arama, filtre, sıralama | URL / React Router search params | Yenileme, geri/ileri ve paylaşılabilir bağlantı korunur |
+| Session, müşteri listesi/detayı | TanStack Query | Uzak verinin cache, loading, error, invalidation ve refetch yaşam döngüsünü yönetir |
+| Açık menü, input taslağı, geçici seçim | Yerel React state | Yalnız ilgili bileşenin kısa ömürlü durumudur |
+| Gerçek çapraz ekran UI ihtiyacı | Önce Context + reducer değerlendirmesi | Redux/Zustand varsayılan değil, kanıtlanmış ihtiyaçtır |
+
+React dokümantasyonu redundant/duplicate state'ten kaçınmayı, render için türetilebilen değerleri state veya Effect içine taşımamayı ve Effect'i dış sistem senkronizasyonu için kullanmayı önerir. API server state'i bileşenlerde `useEffect + useState` ile tekrar kurulmayacak; TanStack Query bu sorumluluğun sahibidir.
+
+### Fetch ve Axios karşılaştırması
+
+| Ölçüt | Native `fetch` | Axios |
+|---|---|---|
+| Dependency | Browser'ın standart API'si; ek paket yok | Üçüncü taraf runtime dependency |
+| HTTP hata davranışı | `4xx/5xx` promise'i reddetmez; wrapper `response.ok` kontrol etmelidir | Varsayılan olarak `2xx` dışını reject eder |
+| JSON/Problem Details | Açıkça parse ve tip dönüşümü gerekir | JSON dönüşümü daha hazırdır; FlowLogix hata tipine yine adapter gerekir |
+| Cookie/CSRF | Same-origin cookie varsayılan; antiforgery header açık politikayla eklenir | Credentials/XSRF config ve interceptor ile merkezileştirilebilir |
+| İptal | Standart `AbortSignal`; TanStack Query sinyali doğrudan iletir | `AbortController` destekler, ancak FlowLogix'e ek üstünlük sağlamaz |
+| Global davranış | Küçük wrapper ile görünür ve projeye özel | Interceptor güçlüdür; aşırı kullanım gizli global akış ve coupling oluşturabilir |
+
+**Karar:** FlowLogix native `fetch` üzerinde küçük, tipli ve framework-bağımsız bir `shared/api` istemcisi kullanacak. Bu “fetch yeterli” kararı değildir: mevcut same-origin cookie modeli, ASP.NET Core Problem Details sözleşmesi ve TanStack Query `AbortSignal` akışı için en az bağımlılıkla en açık politika yüzeyini verir.
+
+İstemci; API-relative URL, JSON serialization, `response.ok`, `204`, content type, typed Problem Details/`ApiError`, request cancellation ve state-changing isteklerde antiforgery header politikasını tek yerde uygulayacak. Feature'lar endpoint/DTO bilgisini taşıyacak; React bileşenleri doğrudan `fetch` çağırmayacak.
+
+Dosya upload progress, browser/Node ortak adapter, çok sayıda dış API için farklı transport politikaları veya gerçekten merkezi interceptor zinciri doğarsa Axios yeniden değerlendirilecek.
+
+### React yazım ve tasarım kuralları
+
+- Bileşenler `PascalCase`, hook'lar `useX`; component ve hook'lar saf, props/state immutable olacak.
+- Hook'lar yalnız component/custom hook tepesinde çağrılacak; koşul, döngü veya callback içine konmayacak.
+- `useEffect` türetilmiş state, event sonucu veya normal veri yükleme için kullanılmayacak; yalnız React dışı sistemle senkronizasyon için kullanılacak.
+- Server mutation başarıları ilgili Query key'lerini invalidate edecek; server verisi ikinci bir global/local store'a kopyalanmayacak.
+- Feature'a özel DTO, query key, API fonksiyonu ve test feature yanında kalacak. `shared` klasörü “belki kullanılır” deposu olmayacak.
+- Semantic HTML, label, klavye kullanımı ve görünür focus ilk bileşenden itibaren kabul kriteridir.
+- `memo`, `useMemo` ve `useCallback` performans ölçümü veya referans kararlılığı gereği olmadan eklenmeyecek.
+- Testler implementation ayrıntısını değil kullanıcının gördüğü ve yaptığı davranışı sınayacak.
+
+### Kaynaklar
+
+- [MDN — Using the Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+- [Axios — First steps](https://axios.rest/pages/getting-started/first-steps)
+- [Axios — Interceptors](https://axios.rest/pages/advanced/interceptors)
+- [Axios — Error handling](https://axios.rest/pages/advanced/error-handling)
+- [TanStack Query — Query cancellation](https://tanstack.com/query/latest/docs/framework/react/guides/query-cancellation)
+- [React — You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+- [React — Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure)
+- [React — Components and Hooks must be pure](https://react.dev/reference/rules/components-and-hooks-must-be-pure)
+
+## R-015 — Node/npm ve frontend dependency sürüm sözleşmesi
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+`package.json`, uygulamanın doğrudan dependency niyetini; `package-lock.json` ise transitive dependency'ler dahil kurulmuş tam ağacı taşır. npm'in `npm ci` komutu manifest ile lockfile uyuşmazsa hata verir, mevcut `node_modules` klasörünü temizler ve manifest/lockfile'a yazmadan donmuş kurulumu tekrarlar.
+
+FlowLogix yayınlanan bir npm kütüphanesi değil, deploy edilen bir uygulamadır. Bu nedenle direct dependency sürümleri manifestte exact tutulacak; transitive ağacı lockfile sabitleyecek. Güncellemeler örtük `npm install` yan etkisiyle değil, ayrı dependency güncellemesi ve lint/test/build doğrulamasıyla yapılacak.
+
+Node için repository kökündeki `.nvmrc` exact `24.16.0` sürümünü yerel version-manager ve gelecekteki `actions/setup-node` girdisi olarak taşıyacak. `package.json` içindeki `engines`, desteklenen Node/npm major hattını görünür kılacak; patch güvenlik güncellemesini gereksiz yere engellemeyecek. `packageManager: npm@11.13.0` seçilen package manager ve sürümünü araçlara bildirecek.
+
+### Kaynaklar
+
+- [npm — package-lock.json](https://docs.npmjs.com/files/package-lock.json/)
+- [npm — npm ci](https://docs.npmjs.com/cli/commands/npm-ci/)
+- [GitHub — actions/setup-node](https://github.com/actions/setup-node)
+- [GitHub — setup-node version files](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md)
+
+## R-016 — Frontend lint derinliği ve plugin uyumluluğu
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+Mevcut ESLint hattı JavaScript, TypeScript syntax, React Hooks ve Fast Refresh kurallarını çalıştırıyor; ancak TypeScript type bilgisini kullanmıyor, TanStack Query cache/hook hatalarını ve Testing Library test örüntülerini özel olarak denetlemiyor.
+
+### Karşılaştırma ve sonuç
+
+- `typescript-eslint` resmi rehberi `recommendedTypeChecked` ve `projectService: true` ile typed lint'i güçlü biçimde öneriyor. Maliyeti, lint sırasında TypeScript programı oluşturulduğu için syntax-only lint'ten daha yavaş olmasıdır. FlowLogix'in küçük başlangıç kod tabanında safety faydası bu maliyetten değerlidir.
+- `@tanstack/eslint-plugin-query@5.101.2`, ESLint 8/9/10 ve TypeScript 5.4/6 peer aralıklarını destekler. Resmi `flat/recommended` profili query dependency, stable client ve query function hatalarını yakalar. Daha opinionated `recommended-strict`, gerçek Query kodu görülmeden seçilmeyecek.
+- `eslint-plugin-testing-library@7.16.2`, ESLint 10'u destekler ve yalnız `*.test.*` dosyalarına uygulanabilen `flat/react` profilini sağlar.
+- `eslint-plugin-jest-dom@5.5.0` faydalı assertion kuralları sunsa da peer dependency aralığı ESLint 10'u kapsamıyor. `--force` veya peer uyarısı bastırılarak eklenmeyecek; uyumlu sürüm yayımlanırsa yeniden değerlendirilecek.
+
+### Kaynaklar
+
+- [typescript-eslint — Typed Linting](https://typescript-eslint.io/getting-started/typed-linting/)
+- [TanStack Query — ESLint Plugin Query](https://tanstack.com/query/v5/docs/eslint/eslint-plugin-query)
+- [Testing Library — eslint-plugin-jest-dom](https://testing-library.com/docs/ecosystem-eslint-plugin-jest-dom/)
+- [eslint-plugin-testing-library npm metadata](https://www.npmjs.com/package/eslint-plugin-testing-library)
+
+## R-017 — TypeScript strictness politikası
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+Vite React template'i mevcut üretimde `strict` seçeneğini açıkça taşımıyor. FlowLogix API DTO, form ve server-state ağırlıklı bir ERP arayüzü olacağı için yalnız syntax/type inference yeterli değildir.
+
+### Seçilen kontroller
+
+- `strict`: nullability, function variance, property initialization ve catch variable gibi strict ailesini birlikte açar.
+- `noUncheckedIndexedAccess`: dizi/index-signature erişimlerine olası `undefined` ekler; bulunmayan satır veya alanın varmış gibi kullanılmasını engeller.
+- `exactOptionalPropertyTypes`: `field?: T` için alanın yokluğu ile `field: undefined` farkını korur. PATCH/request DTO semantiği için değerlidir.
+- `noImplicitReturns`: değer döndürmesi beklenen bütün code path'lerin sonuç üretmesini ister.
+- `noUncheckedSideEffectImports`: CSS/setup gibi yalnız yan etki için yapılan import'lardaki yazım hatasını sessizce yutmaz.
+- `forceConsistentCasingInFileNames`: Windows'ta çalışan fakat Linux CI'da dosya adı casing'i nedeniyle kırılan import'ları engeller.
+- App lib listesine `DOM.Iterable` eklenir; `URLSearchParams`, header ve DOM koleksiyonlarının iterable tipleri kullanılabilir.
+
+`skipLibCheck: true` korunur: uygulama kaynaklarının type-check'ini kapatmaz, dependency declaration dosyalarının kendi aralarındaki tam kontrolünü atlar. Third-party declaration gürültüsünü ve build maliyetini azaltır.
+
+### Kaynaklar
+
+- [TypeScript — strict](https://www.typescriptlang.org/tsconfig/strict.html)
+- [TypeScript — noUncheckedIndexedAccess](https://www.typescriptlang.org/tsconfig/noUncheckedIndexedAccess.html)
+- [TypeScript — exactOptionalPropertyTypes](https://www.typescriptlang.org/tsconfig/exactOptionalPropertyTypes.html)
+- [TypeScript — noImplicitReturns](https://www.typescriptlang.org/tsconfig/noImplicitReturns.html)
+- [TypeScript — noUncheckedSideEffectImports](https://www.typescriptlang.org/tsconfig/noUncheckedSideEffectImports.html)
+- [TypeScript — forceConsistentCasingInFileNames](https://www.typescriptlang.org/tsconfig/forceConsistentCasingInFileNames.html)
+
+## R-018 — Development HTTPS ve Vite proxy güven zinciri
+
+**Tarih:** 2026-06-29
+**Durum:** Tamamlandı
+
+API HTTPS launch adresi `https://localhost:7185`; Vite dev server browser'dan gelen `/api` isteklerini server-side proxy ile bu hedefe aktaracak. Böylece browser Vite origin'ine istek yapar ve CORS yerine production'a benzeyen same-origin cookie modeli korunur.
+
+Yerel ASP.NET Core development certificate geçerli fakat başlangıçta trusted değildi. Kullanıcı `dotnet dev-certs https --trust` ile Current User trust store'a açıkça güven verdi; CLI `TrustLevel: Full`, `localhost` SAN ve geçerlilik süresini doğruladı.
+
+Vite proxy Node process'i içinde çalışır. Node 24 system CA store'u ancak `--use-system-ca`/`NODE_USE_SYSTEM_CA` ile ekler. npm'in project `.npmrc` içindeki `node-options` ayarı lifecycle script'lerine `NODE_OPTIONS` olarak aktarılır, npm process'inin kendisini etkilemez. Frontend `.npmrc` bu nedenle mevcut kullanıcı seçeneklerini koruyarak `--use-system-ca` ekleyecek.
+
+`secure: false`, self-signed sertifika doğrulamasını devre dışı bıraktığı için seçilmedi. `cross-env` veya repository'ye export edilmiş sertifika eklemek de gerekli değildir.
+
+### Kaynaklar
+
+- [Microsoft — dotnet dev-certs](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-dev-certs)
+- [Node.js — `NODE_USE_SYSTEM_CA`](https://nodejs.org/api/cli.html#node_use_system_ca1)
+- [npm — project `.npmrc` ve node-options](https://docs.npmjs.com/files/npmrc/)
+- [npm — node-options config](https://docs.npmjs.com/cli/using-npm/config/)
+- [Vite — server.proxy](https://vite.dev/config/server-options)
+
+## R-019 — ERP frontend component ve styling temeli
+
+**Tarih:** 2026-06-30
+**Durum:** Tamamlandı
+
+FlowLogix; form, durum geri bildirimi, navigasyon, yoğun liste ve ileride grid/date-picker gerektiren operasyonel bir ERP/TMS arayüzüdür. UI temeli yalnız görsel tercih değil; erişilebilirlik, klavye davranışı, tema tutarlılığı ve tek geliştiricinin teslim süresini etkiler.
+
+### Karşılaştırma
+
+| Seçenek | Güçlü taraf | FlowLogix maliyeti | Sonuç |
+|---|---|---|---|
+| Plain CSS / CSS Modules | En az dependency, tam kontrol, CSS öğrenimi | Form/dialog/menu erişilebilirliği ve ortak tasarım sistemi tekrar yazılır | Temel global CSS için kullanılabilir, ana component sistemi seçilmedi |
+| Tailwind + açık component kodu | Yüksek görsel kontrol ve source ownership | Component kaynak/bakım yükü projeye geçer; ERP davranışlarını tek tek birleştirmek gerekir | Geçerli alternatif, MVP hızı için seçilmedi |
+| Ant Design / Mantine | Hazır component seti ve iyi geliştirici deneyimi | FlowLogix'in gelecekteki data-grid ve Material ekosistem devamlılığına göre daha az uygun | Seçilmedi |
+| Material UI v9 | React 19 uyumu, erişilebilir hazır component'ler, tema/CSS variables, MUI X Community evrim yolu | Emotion runtime dependency'si ve API öğrenme maliyeti | Seçildi |
+
+MUI `9.1.2`, React 17/18/19 ve TypeScript 4.9+ destekler; FlowLogix React `19.2.7` ve TypeScript `6.0.3` ile uyumludur. Default styling engine olarak `@emotion/react 11.14.0` ve `@emotion/styled 11.14.1` kullanılır. Üçü de MIT lisanslıdır.
+
+MUI X Data Grid Community MIT lisanslı pagination/sorting/filtering sağlar; Pro/Premium advanced özellikleri ticari lisanslıdır. Data Grid şimdi kurulmayacak. Customer listesi use-case'inde server-side gereksinim ve Community lisans sınırı yeniden incelenecek.
+
+### Uygulama kuralları
+
+- ThemeProvider ve CssBaseline app composition katmanında tek kez kurulacak.
+- Marka rengi, spacing, typography ve component default'ları theme token'larında tutulacak; ekranlara rastgele hex/spacing dağıtılmayacak.
+- Harici font CDN'i kullanılmayacak; ilk tema sistem font stack kullanacak.
+- `sx` küçük ve yerel layout/stil için; tekrar eden ürün varyantı theme component override veya ortak UI component için kullanılacak.
+- MUI component kullanmak semantic HTML, label, focus ve keyboard test sorumluluğunu ortadan kaldırmaz.
+- Icon, Data Grid, date picker ve Pro/Premium paketleri gerçek ihtiyaç doğmadan eklenmeyecek.
+
+### Kaynaklar
+
+- [MUI — Stable versions](https://mui.com/material-ui/getting-started/versions/)
+- [MUI — Installation and React peers](https://mui.com/material-ui/getting-started/installation/)
+- [MUI — Supported platforms](https://mui.com/material-ui/getting-started/supported-platforms/)
+- [MUI — Theming](https://mui.com/material-ui/customization/theming/)
+- [MUI X — Data Grid](https://mui.com/x/react-data-grid/)
+- [MUI X — Licensing](https://mui.com/x/introduction/licensing/)
+- [Tailwind — Utility-first styling](https://tailwindcss.com/docs/utility-first/)
+
+## R-020 — FlowLogix'e özgü Operasyon Kontrol Kulesi tasarım dili
+
+**Tarih:** 2026-06-30
+**Durum:** Tamamlandı
+
+FlowLogix farklılığını dekoratif dashboard kartlarından değil, Word ürün referansındaki operasyon istisnaları, açıklanabilir atama, planlanan–gerçekleşen kârlılık, dijital sevkiyat pasaportu ve belge tamlığı davranışlarından alacak.
+
+### Görsel ve etkileşim imzası
+
+- Koyu lacivert operasyon navigasyonu, açık ve yüksek kontrastlı çalışma yüzeyi; masaüstü operasyon yoğunluğu öncelikli, küçük ekranlar işlevsiz bırakılmayacak.
+- Planlanan akış kesik, gerçekleşen akış düz çizgiyle; gecikme ve sapma ayrı işaret/etiketle gösterilecek.
+- Exception kartı yalnız renk değil önem, neden, geçen süre ve önerilen aksiyon taşıyacak.
+- Açıklanabilir atama puanı; katkı, engel ve hard/soft constraint nedenleriyle birlikte gösterilecek.
+- Belge tamlığı görsel oranla birlikte eksik/geçersiz belge listesini sunacak.
+- Planlanan–gerçekleşen kârlılık sapması renk, yön ikonu ve sayısal değerle anlatılacak.
+- Animasyonlar kısa ve işlevsel olacak; reduced-motion tercihi desteklenmeden kritik bilgi animasyona bağlanmayacak.
+- Glassmorphism, yoğun gradient, sürekli hareket ve renk-only status kullanımı operasyon okunabilirliğini bozduğu için tasarım hedefi değildir.
+
+### Kütüphane kapıları
+
+| Araç | Olası kullanım | Benimseme kapısı |
+|---|---|---|
+| `@phosphor-icons/react 2.1.10` | Duotone operasyon/navigation ikonları | İlk gerçek shell navigasyonunda direct-path import ve bundle ölçümü |
+| `motion 12.42.0` | Route/feedback geçişleri | CSS transition yetersiz kalır ve reduced-motion davranışı test edilebilir olur |
+| `@mui/x-charts 9.7.0` | Kârlılık ve KPI grafikleri | Gerçek KPI veri sözleşmesi tanımlanır |
+| `maplibre-gl 5.24.0` + React binding | Sevkiyat/durak haritası | Harita use-case'i, tile sağlayıcı/lisans/maliyet/CSP kararı netleşir |
+| `@mui/x-data-grid` Community | Server-side müşteri/operasyon listeleri | İlk gerçek liste use-case'inde Community özellik/lisans sınırı doğrulanır |
+
+Şimdi yalnız theme ve shell için gereken mekanizmalar kurulacak; roadmap'teki bütün “havalı” araçlar foundation'a yığılmayacak.
+
+### Kaynaklar
+
+- [MUI — Free dashboard templates](https://mui.com/material-ui/getting-started/templates/)
+- [MUI — CSS theme variables](https://mui.com/material-ui/customization/css-theme-variables/overview/)
+- [Phosphor React — tree shaking ve direct import](https://github.com/phosphor-icons/react)
+- [Motion — reduced motion](https://motion.dev/docs/react-use-reduced-motion)
+- [MUI X — charts/data-rich components](https://mui.com/x/)
+- [MapLibre GL JS](https://maplibre.org/projects/gl-js/)
+
+## R-021 — Frontend formatter ve editör bağımsız format kapısı
+
+**Tarih:** 2026-06-30
+
+**Durum:** Tamamlandı
+
+`Ctrl+S` dosyayı kaydeder; Visual Studio'da ayrıca formatter entegrasyonu veya format-on-save olmadığı sürece mevcut TSX girintisini yeniden yazmaz. `.editorconfig` kuralı editöre ve uyumlu araçlara politika bildirir, tek başına bütün eski satırları dönüştüren bir komut değildir.
+
+### Karşılaştırma
+
+| Seçenek | Güçlü taraf | FlowLogix etkisi | Sonuç |
+|---|---|---|---|
+| Yalnız `.editorconfig`/Visual Studio | Ek paket yok | Editör desteğine bağlı; CI mevcut biçimi güvenilir biçimde denetleyemez | Tek başına yetersiz |
+| Prettier | Deterministik format, geniş TS/TSX desteği, `.editorconfig` okuma, ayrı `--write`/`--check` | Tek format dependency'si ve ilk toplu format farkı | Seçildi |
+| Biome | Çok hızlı birleşik formatter ve linter | Mevcut type-aware ESLint ve framework plugin hattıyla sorumluluk çakışması veya tam göç gerektirir | Şimdi seçilmedi |
+| ESLint formatting kuralları/plugin | Tek lint komutunda görünür | Linter ile formatter sorumluluğunu ve hata çıktısını karıştırır | Seçilmedi |
+
+Prettier'ın resmi kurulum rehberi exact, proje-yerel sürüm kullanılmasını; editor eklentisinin de bu yerel sürümü seçmesini ve CI için `prettier . --check` çalıştırılmasını önerir. Prettier `.editorconfig` içindeki `indent_size` ve `end_of_line` gibi alanları okuyabilir. FlowLogix bu nedenle 2 boşluk/LF kararını tekrar etmeyecek; yalnız semicolon, quote, trailing comma ve satır genişliğini Prettier config içinde belirtecek.
+
+İlk `format:check`, `AppProviders.tsx` dâhil 14 mevcut dosyada format farkı buldu. Bu sonuç formatter kurulumunun çalıştığını, fakat ilk baseline'ın kullanıcı tarafından henüz yazılmadığını gösterir.
+
+### Kaynaklar
+
+- [Prettier — Install](https://prettier.io/docs/install)
+- [Prettier — Configuration ve EditorConfig](https://prettier.io/docs/configuration)
+- [Prettier — Editor integration](https://prettier.io/docs/editors/)
+- [typescript-eslint — What About Formatting?](https://typescript-eslint.io/users/what-about-formatting/)
+- [Biome — Formatter ve Prettier uyumluluğu](https://biomejs.dev/)

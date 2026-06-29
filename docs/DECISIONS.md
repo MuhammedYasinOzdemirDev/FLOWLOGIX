@@ -180,3 +180,109 @@
 - **Uyumluluk:** TypeScript 6 kararlı kalacak. Sonar resmi desteği TS6'yı kapsayana kadar ilk analiz C# ile sınırlandırılacak; analiz aracı uğruna frontend 5.9'a düşürülmeyecek.
 - **Coverage:** Gerçek testler oluşmadan coverage quality gate bloklaması yapılmayacak. Coverage üretimi Sonar'ın işi değildir; uygun test aracıyla rapor üretildikten sonra import edilecek.
 - **Araştırma:** `docs/RESEARCH.md` içindeki R-012.
+
+## D-019 — Frontend foundation araçları
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **Runtime/build:** Node `24.16.0`, npm `11.13.0`, official `create-vite@9.1.0` `react-ts` template, Vite `8.1.0`, React/DOM `19.2.7` ve TypeScript `6.0.3`.
+- **Routing:** Önceki React Router 7 planı, yeni proje için `react-router@8.0.1` Declarative Mode olarak güncellendi. Node/React/Vite minimumları mevcut stack ile tam uyumludur; `react-router-dom` kullanılmayacak.
+- **Server state:** `@tanstack/react-query@5.101.2`; Redux/Zustand başlangıçta yok.
+- **Test/lint:** Vitest `4.1.9`, Testing Library React `16.3.2`, Testing Library DOM `10.4.1`, user-event `14.6.1`, jest-dom `6.9.1`, jsdom `29.1.1`; ESLint `10.6.0`, typescript-eslint `8.62.0` ve Query ESLint plugin `5.101.2`.
+- **Sınır:** React Compiler, Router Framework/Data Mode, Axios ve form/state kütüphanesi kanıtlanmış ihtiyaç olmadan eklenmeyecek.
+- **Paket politikası:** Exact çözüm `package-lock.json` ile korunacak ve CI `npm ci` kullanacak. Node/npm pin'i frontend config aşamasında repository'ye eklenecek.
+- **TLS:** `strict-ssl` kapatılmayacak. Yerel Windows CA zinciri için npm komutları process-level `NODE_OPTIONS=--use-system-ca` ile çalıştırılacak; repository'ye CA/secret yazılmayacak.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-013.
+
+## D-020 — Frontend mimarisi ve HTTP politikası
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **Mimari:** React kodu `app`, iş kabiliyeti odaklı `features` ve yalnız gerçekten ortak parçalar için `shared` sınırlarını kullanacak. Boş klasör ordusu veya yatay `components/services/hooks` deposu oluşturulmayacak.
+- **State sahipliği:** URL state React Router'a, server state TanStack Query'ye, kısa ömürlü form/UI state React'e ait olacak. Aynı veri birden fazla state katmanına kopyalanmayacak.
+- **HTTP istemcisi:** Axios başlangıç dependency'si olmayacak. Native `fetch` üzerinde same-origin cookie, antiforgery, JSON, Problem Details, `204`, HTTP hata ve `AbortSignal` davranışını merkezileştiren tipli bir `shared/api` istemcisi kurulacak.
+- **API sınırı:** Ortak transport/hata politikası `shared/api`; endpoint ve DTO bilgisi ilgili feature içinde kalacak. React bileşeni doğrudan `fetch` çağırmayacak.
+- **React disiplini:** Saf/immutable bileşenler, hook kuralları, gereksiz Effect ve duplicate state yasağı, semantic HTML/accessibility ve davranış odaklı testler ilk ekrandan uygulanacak.
+- **Yeniden değerlendirme:** Upload progress, birden çok dış API/adapter veya gerçek interceptor ihtiyacı Axios'u; karmaşık tekrar eden form davranışı form kütüphanesini; kanıtlanmış global client-state ihtiyacı ayrı state kütüphanesini gündeme getirir.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-014.
+
+## D-021 — Frontend runtime ve dependency sürüm politikası
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **Node:** Repository kökü `.nvmrc` ile `24.16.0` sürümünü pinleyecek; gelecekte CI aynı dosyayı okuyacak.
+- **npm:** `package.json` `packageManager: npm@11.13.0` taşıyacak.
+- **Uyumluluk:** `engines`, Node `>=24.16.0 <25` ve npm `>=11.13.0 <12` destek hattını bildirecek. Exact yerel/CI baseline ile uyumluluk aralığı birbirinden ayrılacak.
+- **Dependency:** Deploy edilen uygulamanın bütün direct dependencies/devDependencies girdileri exact olacak; transitive ağaç tracked `package-lock.json` ile kilitlenecek.
+- **Kurulum:** Yeni paket için kontrollü `npm install --save-exact`; temiz yerel/CI doğrulama için salt-okunur `npm ci` kullanılacak.
+- **Güncelleme:** Paket güncellemesi ayrı değişiklik olarak incelenecek ve lint/test/build kapılarından geçecek.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-015.
+
+## D-022 — Type-aware ve sorumluluk odaklı frontend lint
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **TypeScript:** Mevcut syntax kurallarına `recommendedTypeChecked` ve Project Service eklenecek; lint'in type bilgisi kullanması kabul edilen küçük performans maliyetidir.
+- **Query:** `@tanstack/eslint-plugin-query@5.101.2` resmi `flat/recommended` profili kullanılacak; strict profil gerçek Query kodu ve ekip deneyimi oluşmadan açılmayacak.
+- **Test:** `eslint-plugin-testing-library@7.16.2` yalnız test dosyalarında React profiliyle uygulanacak.
+- **Uyumsuzluk:** `eslint-plugin-jest-dom@5.5.0`, ESLint 10 peer desteği vermediği için zorla kurulmayacak; uyumlu release kapısında yeniden incelenecek.
+- **Kural:** Plugin sayısı kalite göstergesi değildir. Her plugin yalnız sahip olduğu framework davranışına ve uygun dosya kapsamına uygulanacak.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-016.
+
+## D-023 — TypeScript strict application ve tool config
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **Kapsam:** App ve Node tool TSConfig'lerinde `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`, `noUncheckedSideEffectImports` ve `forceConsistentCasingInFileNames` etkin olacak.
+- **Browser tipleri:** App config `ES2023`, `DOM` ve `DOM.Iterable` kullanacak.
+- **Ayrım:** App kaynakları `moduleResolution: bundler`; Node tarafından çalışan Vite/Vitest config'leri `module: nodenext` kullanmayı sürdürecek.
+- **Dependency declarations:** `skipLibCheck: true`, uygulama type-check'ini değil yalnız dependency `.d.ts` iç kontrolünü atladığı için korunacak.
+- **Güncelleme riski:** `strict` ailesi yeni TypeScript sürümünde genişleyebilir; exact TypeScript güncellemesi ayrı taskta lint/test/build ile incelenecek.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-017.
+
+## D-024 — Trusted HTTPS development proxy
+
+- **Tarih:** 2026-06-29
+- **Durum:** Kabul edildi
+- **Proxy:** Browser yalnız Vite origin'ine `/api` isteği yapacak; Vite development proxy isteği `https://localhost:7185` ASP.NET Core hedefine aktaracak.
+- **TLS:** ASP.NET Core development certificate Windows Current User store'da trusted olacak; Vite proxy sertifika doğrulamasını kapatmayacak.
+- **Node CA:** Frontend project `.npmrc`, mevcut `NODE_OPTIONS` değerini koruyup `--use-system-ca` ekleyecek; ek `cross-env` dependency'si veya tracked certificate olmayacak.
+- **npm policy:** Aynı `.npmrc` gelecekte `save-exact=true` ve `engine-strict=true` ile D-021 sürüm politikasını mekanik olarak destekleyecek.
+- **Sınır:** Bu yalnız development davranışıdır. Production'da ASP.NET Core frontend çıktısını same-origin sunacak; Vite proxy bulunmayacak.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-018.
+
+## D-025 — Material UI tabanlı ERP frontend tasarım sistemi
+
+- **Tarih:** 2026-06-30
+- **Durum:** Kabul edildi
+- **Core:** `@mui/material@9.1.2`, `@emotion/react@11.14.0` ve `@emotion/styled@11.14.1` exact sürümleri kullanılacak.
+- **Neden:** Veri/form yoğun ERP arayüzünde erişilebilir component davranışı, tema tutarlılığı ve tek geliştiricinin MVP teslim hızı; React 19 ve TypeScript 6 hattıyla uyumluluk.
+- **Tema:** Root composition'da ThemeProvider + CssBaseline; CSS variables ve sistem font stack. Marka/layout değerleri theme token'larında tutulacak.
+- **Stil sınırı:** Yerel ve tek seferlik düzen için `sx`; tekrar eden ürün davranışı için theme override veya `shared/ui`. Rastgele ortak component ve dağınık raw renk/spacing üretilmeyecek.
+- **Paket sınırı:** Icons, MUI X Data Grid ve date pickers ilk gerçek kullanım öncesinde ayrıca değerlendirilecek. Data Grid Community MIT, Pro/Premium ticari sınırı gözden kaçırılmayacak.
+- **Alternatifler:** Plain CSS/CSS Modules; Tailwind + açık component kodu; Ant Design; Mantine.
+- **Yeniden değerlendirme:** MUI erişilebilirlik/customization engeli, ölçülmüş bundle sorunu veya Community grid'in zorunlu use-case'i karşılamaması.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-019.
+
+## D-026 — Operasyon Kontrol Kulesi görsel kimliği
+
+- **Tarih:** 2026-06-30
+- **Durum:** Kabul edildi
+- **Kimlik:** Koyu operasyon rayı, açık çalışma yüzeyi, yüksek bilgi yoğunluğu ve ürün davranışından türeyen durum/sapma görselleri kullanılacak.
+- **Ürün imzaları:** Planned/actual timeline dili, exception severity+age+action, açıklanabilir atama katkıları, belge tamlığı ve kârlılık sapması.
+- **Erişilebilirlik:** Durum yalnız renkle anlatılmayacak; metin/ikon/şekil eşlik edecek. Hareket reduced-motion tercihini izleyecek.
+- **Kaçınılacaklar:** Generic admin-template kopyası, dekoratif fake KPI, yoğun glassmorphism, sürekli animasyon ve rastgele gradient.
+- **Araç kapısı:** Phosphor ilk gerçek icon ihtiyacında; Motion gerçek transition ihtiyacında; MUI Charts gerçek KPI sözleşmesinde; MapLibre harita/tile kararıyla; Data Grid gerçek liste use-case'inde değerlendirilir.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-020.
+
+## D-027 — ESLint'ten ayrı Prettier format kapısı
+
+- **Tarih:** 2026-06-30
+- **Durum:** Kabul edildi
+- **Formatter:** Frontend biçimlendirmesi proje-yerel ve exact `prettier@3.9.1` ile yapılacak.
+- **Sorumluluk ayrımı:** ESLint olası kod ve framework kullanım hatalarını; Prettier yalnız yerleşim, girinti ve satır kırılımını denetleyecek. Prettier ESLint içinde plugin olarak çalıştırılmayacak.
+- **Stil:** `.editorconfig` TS/TSX için 2 boşluk ve LF politikasının kaynağıdır. Prettier config ayrıca semicolonsuz yazım, tek tırnak, trailing comma ve 100 karakter satır genişliğini tanımlar.
+- **Komutlar:** `npm run format` dosyaları yazar; `npm run format:check` dosyaları değiştirmeden yerel/CI kapısı olarak denetler.
+- **Alternatif:** Biome hızlı ve bütünleşik bir formatter/linter'dır; mevcut type-aware ESLint, React, Query ve Testing Library lint hattını tekrar eden ikinci bir toolchain oluşturacağı için seçilmedi.
+- **Yeniden değerlendirme:** Frontend ölçeği büyüyüp ölçülmüş formatter/lint süresi sorun olursa Biome/Oxlint geçişi tek parça toolchain kararı olarak incelenir.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-021.
