@@ -309,3 +309,13 @@ FLOW-001 ilk uzak CI doğrulamasında:
 - **Güvenlik sınırı:** Dependabot PR'ları otomatik merge edilmez. Tam SHA değişimi, sürüm açıklaması, release notları ve CI sonucu kullanıcı tarafından incelenir.
 - **Doğrulama:** `dependabot.yml` ve `ci.yml` Prettier/YAML biçiminden geçti; her iki dosya LF standardında. FLOW-001.10e tamamlandı.
 - **Yaygın hata:** SHA sabitlemesini “artık bakım gerekmez” sanmak, bütün ekosistemleri tek seferde açıp PR gürültüsü üretmek veya CI sonucu görülmeden bot PR'ını otomatik birleştirmek.
+
+## L-036 — Doğrudan yazılmayan geçişli paket de CI'ı durdurabilir
+
+- **Bağlam:** FLOW-001.10f ilk uzak Backend CI koşusu
+- **Başlangıç seviyesi:** Bir paket başka bir paketi yanında getirebilir; buna geçişli bağımlılık denir. Proje dosyasında adı görünmese bile güvenlik taraması bu alt paketi denetler.
+- **Gerçek davranış:** `Microsoft.AspNetCore.OpenApi 10.0.9`, `Microsoft.OpenApi >= 2.0.0` ister. NuGet uygun en düşük sürüm olan `2.0.0`ı seçti; repository warning-as-error kullandığı için yüksek önem dereceli `NU1903` uyarısı restore işlemini başarısız yaptı.
+- **Güvenlik kararı:** Uyarıyı bastırmak sorunu çözmez. Aynı 2.x ana sürüm hattındaki düzeltilmiş ve güncel kararlı `Microsoft.OpenApi 2.9.0` doğrudan sabitlenerek hem güvenlik açığı kapatılabilir hem de gereksiz 3.x kırılma riski alınmaz.
+- **Yerel doğrulama:** API paket ağacı hem istenen hem çözümlenen sürümü `2.9.0` olarak gösterdi. Release solution build'i `0` uyarı/`0` hatayla ve iki geçici test başarıyla tamamlandı; solution genelindeki geçişli güvenlik taraması bilinen açık bulmadı.
+- **Kanıt sınırı:** İlk uzak koşuda Frontend ve Dependabot kontrolleri geçti; Backend derleme ve test adımlarına restore başarısız olduğu için ulaşılamadı. FLOW-001.10f ancak düzeltme PR'a gönderilip ikinci uzak koşu tamamen yeşil olduğunda kapanabilir.
+- **Yaygın hata:** Geçişli bağımlılıkları görünmez sanmak, güvenlik uyarısını `NoWarn` ile susturmak veya güvenli en küçük ana sürüm değişikliği yerine düşünmeden yeni major sürüme geçmek.

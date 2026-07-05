@@ -7,7 +7,7 @@
 - **Aktif alt task:** FLOW-001.10f — İlk uzak workflow koşusunu doğrula
 - **Branch:** `feature/FLOW-001-foundation`
 - **Son doğrulanan kaynak commit:** `8bb0f8a` — `feat(web): establish operations control shell`
-- **Son repository commit (bu belge commit'i öncesi):** `bd882ad` — `ci: add build and action update automation`
+- **Son repository commit:** `71c7f0c` — `docs: record verified CI foundation`
 
 ## Mevcut repository yapısı
 
@@ -156,6 +156,12 @@
 - Kullanıcı `.github/dependabot.yml` dosyasını oluşturdu. İlk kayıttaki CRLF satır sonları Prettier ile LF'ye çevrildi; son durumda iki GitHub YAML dosyası Prettier, whitespace ve LF kontrollerinden geçti.
 - Dependabot config'i yalnız `github-actions`, kök dizin taraması, haftalık pazartesi 06:00 Europe/Istanbul ve en fazla üç açık PR sınırı içeriyor. Action SHA sabitlemesi ve bakım politikası birlikte doğrulandı; FLOW-001.10e tamamlandı.
 - Doğrulanmış CI workflow ve Dependabot Actions politikası `bd882ad ci: add build and action update automation` commit'inde ayrı altyapı değişikliği olarak kaydedildi.
+- CI kararları ve doğrulama kanıtları `71c7f0c docs: record verified CI foundation` commit'inde kaydedildi; iki commit `feature/FLOW-001-foundation` branch'ine başarıyla push edildi.
+- `feature/FLOW-001-foundation` → `main` için taslak PR #1 oluşturuldu: `https://github.com/MuhammedYasinOzdemirDev/FLOWLOGIX/pull/1`.
+- İlk `pull_request` koşusunda Frontend işi ve Dependabot yapılandırma kontrolü geçti; Backend işi restore adımında durdu. GitHub Actions logu, `Microsoft.AspNetCore.OpenApi 10.0.9` bağımlılık zincirinin en düşük uygun sürüm olarak seçtiği `Microsoft.OpenApi 2.0.0` için `NU1903` yüksek önem dereceli `GHSA-v5pm-xwqc-g5wc` uyarısını ve warning-as-error nedeniyle exit code `1` sonucunu gösterdi.
+- GitHub Advisory Database'e göre etkilenen 2.x aralığı `2.0.0-preview11`–`2.7.4`, düzeltilmiş ilk 2.x sürümü `2.7.5`tir. Kullanıcı onayıyla mevcut 2.x API hattını koruyan güncel kararlı `Microsoft.OpenApi 2.9.0`, merkezi paket yönetimine ve API projesine doğrudan referans olarak eklendi.
+- Paket düzeltmesi sonrasında Release restore/build/test yerelde geçti: beş proje `0` uyarı/`0` hata ile derlendi ve iki geçici keşif testi geçti. Paket ağacı `Microsoft.OpenApi 2.9.0` sürümünün istendiğini ve çözümlendiğini gösterdi; tüm solution için geçişli paketler dâhil güvenlik açığı taraması bilinen açık bulmadı.
+- GitHub CLI `2.96.0`, resmî `GitHub.cli` winget paketiyle kuruldu. CLI henüz bir GitHub hesabına bağlanmadı; `gh auth login` kullanıcı onayı bekliyor.
 - Bu oturumda `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; yaşayan frontend belgeleri bu handoff commit'iyle kaydedildi. Push veya merge yapılmadı.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
@@ -259,7 +265,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-CI workflow, Dependabot config ve yaşayan belgeler amaçlarına göre commit edilecek; kullanıcı push için ayrıca açık onay verdikten sonra branch GitHub'a gönderilecek ve FLOW-001.10f kapsamında ilk Backend/Frontend uzak workflow sonuçları incelenecek.
+Kullanıcı paket güvenliği düzeltmesini ve yaşayan belge güncellemelerini inceleyip commit/push için açık onay verecek; ardından PR #1'in ikinci uzak Backend/Frontend koşusu izlenecek.
 
 ## Yeni sohbet okuma sırası
 
