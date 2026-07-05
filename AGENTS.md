@@ -39,6 +39,12 @@ Her teknik adım iki katmanlı anlatılır:
 
 Framework çağrıları yalnız isim olarak verilmez; pipeline'da ne zaman çalıştığı ve hangi problemi çözdüğü açıklanır.
 
+React anlatılırken kullanıcının temel kavramları bildiği varsayılmaz. Yeni bir bileşen veya MUI/Router kavramı kullanılmadan önce bu parçanın görevi, ekranda neyi temsil ettiği ve diğer bileşenlerle nasıl çalıştığı sade Türkçeyle açıklanır. Anlatım şu sırayı izler: ortaya çıkacak ekranın genel görünümü → kullanılacak parçalar → verinin bileşenler arasında ilerleyişi ve ekranda gösterilmesi → değişecek dosyalar → kod → önemli satırlar → doğrulama. Kısa yazmak uğruna kopuk cümleler, gereksiz yabancı terimler veya açıklanmamış teknik ifadeler kullanılmaz.
+
+Kullanıcıya gönderilecek öğretici metin, gönderilmeden önce Türkçe anlatım bakımından yeniden okunur. Yanlış kelime seçimi, İngilizceden doğrudan çevrilmiş yapay ifade, eksik özne/yüklem ve aynı düşünceyi bölen kopuk cümleler düzeltilir. Teknik terim gerekli olduğunda terimin Türkçe karşılığı veya kısa anlamı ilk kullanımda verilir.
+
+Yanıt, React'i yeni öğrenen kullanıcının gözünden ikinci kez okunur: Kullanıcının henüz bilmediği hangi kavram varsayılmış, kod sonunda ekranda ne değişecek ve verilen adımın önceki adımla bağlantısı anlaşılır mı soruları denetlenir. “Route ağacı” gibi Türkçe–İngilizce karışımı ifadeler kullanılmaz; önce “adres eşleme yapısı” denir, gerekiyorsa kod terimi `route` parantez içinde belirtilir.
+
 ## Context ve handoff disiplini
 
 - Her task başlangıcında bu dosyadaki okuma sırası uygulanır; sohbet özeti tek başına kaynak kabul edilmez.
@@ -72,9 +78,10 @@ Frontend `src/FlowLogix.Web` altında oluşturuldu. Mevcut doğrulanmış komutl
 
 ```powershell
 npm ci --prefix .\src\FlowLogix.Web
+npm run format:check --prefix .\src\FlowLogix.Web
 npm run lint --prefix .\src\FlowLogix.Web
 npm run test --prefix .\src\FlowLogix.Web
 npm run build --prefix .\src\FlowLogix.Web
 ```
 
-Mevcut tek frontend testi Vite demo sayacının geçici keşif testidir; ürün davranışı/coverage kanıtı sayılmaz ve uygulama kabuğu oluşunca değiştirilir.
+Mevcut tek frontend testi, kalıcı uygulama çerçevesini ve operasyon genel bakış sayfasının görünür kullanıcı sözleşmesini sınar. Bu test başlangıç kabuğu için gerçek davranış kanıtıdır; henüz auth, müşteri veya lokasyon akışlarını kapsamaz.

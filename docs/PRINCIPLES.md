@@ -26,6 +26,12 @@ Karar ve doğrulama sırası:
 
 Her adım önce kod bilmeyen biri için kısa bir amaç/benzetmeyle, ardından geliştirici seviyesinde gerçek davranış ve risklerle anlatılır. Teknik terim ilk geçtiğinde sade karşılığı verilir; fakat doğruluk uğruna gerekli ayrıntı saklanmaz.
 
+React adımlarında kullanıcının temel bileşen ve kütüphane kavramlarını bildiği kabul edilmez. `Box`, `Stack`, `sx`, provider, route veya hook gibi bir kavram ilk kez kullanıldığında önce ekranda neyi temsil ettiği, neden seçildiği ve diğer bileşenlerle nasıl çalıştığı açıklanır. Önce ortaya çıkacak ekranın genel görünümü anlatılır, sonra parçalar tanıtılır, en son kod verilir. Kopuk cümlelerden ve art arda kullanılan açıklamasız teknik terimlerden kaçınılır.
+
+Öğretici metin gönderilmeden önce Türkçe anlatım yönünden gözden geçirilir. Yanlış kelime seçimi, yapay çeviri, eksik cümle ve gereksiz Türkçe–İngilizce karışımı düzeltilir. Zorunlu teknik terimin kısa Türkçe anlamı ilk kullanımda verilir.
+
+Yanıt ayrıca React'i yeni öğrenen kullanıcının bakış açısıyla yeniden okunur. Açıklanmadan varsayılan kavramlar, ekranda oluşacak sonucu belirsiz bırakan anlatımlar ve adımlar arasındaki kopukluk giderilir. Türkçe karşılığı bulunan kavramlarda önce Türkçe ifade kullanılır; kaynak koddaki ad gerekiyorsa `route`, `layout` veya `provider` gibi teknik ad parantez içinde verilir.
+
 Her kaynak kod adımı şu sırayı izler:
 
 1. İş amacı ve lojistik/ERP karşılığı

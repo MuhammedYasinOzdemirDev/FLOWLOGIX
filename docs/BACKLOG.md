@@ -62,18 +62,26 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
       - [x] FLOW-001.8d.5b — Kullanıcı ilk format taban çizgisini kaynak dosyalara uygulasın
       - [x] FLOW-001.8d.5c — Format check, lint, test ve production build kapılarını birlikte doğrula
   - [x] FLOW-001.8e — Frontend state sahipliği, feature mimarisi, React yazım kuralları ve fetch/Axios kararını belirle
-  - [ ] FLOW-001.8e.1 — Başlangıç şablonunu boş klasör oluşturmadan FlowLogix uygulama kabuğuna indirgeme planını uygula
+  - [x] FLOW-001.8e.1 — Başlangıç şablonunu boş klasör oluşturmadan FlowLogix uygulama kabuğuna indirgeme planını uygula
     - [x] FLOW-001.8e.1a — ERP arayüzü için styling/component seçeneklerini karşılaştır ve UI temelini seç
       - [x] FLOW-001.8e.1a.1 — FlowLogix'e özgü Operasyon Kontrol Kulesi görsel/etkileşim dilini ve ek kütüphane kapılarını belirle
     - [x] FLOW-001.8e.1b — MUI core ve Emotion dependency'lerini exact sürümle ekle
-    - [ ] FLOW-001.8e.1c — Theme, CssBaseline, QueryClient ve BrowserRouter provider composition'ını kur
+    - [x] FLOW-001.8e.1c — Theme, CssBaseline, QueryClient ve BrowserRouter provider composition'ını kur
       - [x] FLOW-001.8e.1c.1 — FlowLogix theme token'larını ve MUI component default'larını tanımla
       - [x] FLOW-001.8e.1c.2 — QueryClient ve root AppProviders composition'ını oluştur
-      - [ ] FLOW-001.8e.1c.3 — React bootstrap'ı AppProviders üzerinden bağla
-    - [ ] FLOW-001.8e.1d — İlk gerçek route/layout kabuğunu kur ve Vite demo asset'lerini kaldır
-    - [ ] FLOW-001.8e.1e — Geçici demo testini uygulama kabuğu davranış testiyle değiştir
-  - [ ] FLOW-001.8f — Clean install, lint, test ve production build kapılarını doğrula
-- [ ] FLOW-001.9 — Restore/build sonuçlarını agent doğrulasın
+      - [x] FLOW-001.8e.1c.3 — React bootstrap'ı AppProviders üzerinden bağla
+    - [x] FLOW-001.8e.1d — İlk gerçek adres yönlendirme ve sayfa iskeletini kur; Vite demo dosyalarını kaldır
+      - [x] FLOW-001.8e.1d.1 — Bildirimsel adres kuralları, URL'yi değiştirmeyen ortak sayfa iskeleti, `Outlet` ve ikon seçeneklerini karşılaştır
+      - [x] FLOW-001.8e.1d.2 — Phosphor ikonlarını exact sürüm ve direct-path import politikasıyla ekle
+      - [x] FLOW-001.8e.1d.3 — Kalıcı operasyon çerçevesini `AppShell` içinde oluştur
+      - [x] FLOW-001.8e.1d.4 — Uygulamanın adres eşleme yapısını ortak sayfa iskeleti ve ana adresle bağla
+        - [x] FLOW-001.8e.1d.4a — Ana adreste gösterilecek, sahte veri içermeyen başlangıç sayfasını ilgili özellik klasöründe oluştur
+        - [x] FLOW-001.8e.1d.4b — Adres kurallarını ortak sayfa iskeleti ve başlangıç sayfasıyla eşleştir
+        - [x] FLOW-001.8e.1d.4c — React başlangıç noktasını yeni adres eşleme bileşenine bağla
+      - [x] FLOW-001.8e.1d.5 — Vite demo kaynak/asset'lerini kaldır ve format/lint/test/build ile doğrula
+    - [x] FLOW-001.8e.1e — Geçici demo testini uygulama kabuğu davranış testiyle değiştir
+  - [x] FLOW-001.8f — Clean install, lint, test ve production build kapılarını doğrula
+- [x] FLOW-001.9 — Restore/build sonuçlarını agent doğrulasın
 - [ ] FLOW-001.10 — Frontend yerel kapısı da yeşil olduktan sonra GitHub Actions CI akışını ekle
   - [x] FLOW-001.10a — CI alternatiflerini, güncel official action hattını ve güvenlik kurallarını araştır
   - [ ] FLOW-001.10b — PR ve `main` push tetikleyicili, read-only permission'lı CI workflow taslağını kullanıcı oluştursun

@@ -286,3 +286,25 @@
 - **Alternatif:** Biome hızlı ve bütünleşik bir formatter/linter'dır; mevcut type-aware ESLint, React, Query ve Testing Library lint hattını tekrar eden ikinci bir toolchain oluşturacağı için seçilmedi.
 - **Yeniden değerlendirme:** Frontend ölçeği büyüyüp ölçülmüş formatter/lint süresi sorun olursa Biome/Oxlint geçişi tek parça toolchain kararı olarak incelenir.
 - **Araştırma:** `docs/RESEARCH.md` içindeki R-021.
+
+## D-028 — Declarative nested route ve kalıcı uygulama kabuğu
+
+- **Tarih:** 2026-07-05
+- **Durum:** Kabul edildi
+- **Route sahibi:** `app` katmanı `<Routes>/<Route>` ile yalnız URL–ekran composition'ını yapacak; iş davranışı ve endpoint bilgisi feature sayfalarında kalacak.
+- **Layout:** Path taşımayan bir layout route, `AppShell` bileşenini URL'ye ek segment koymadan operasyon sayfalarına uygulayacak. Eşleşen çocuk sayfa shell içindeki `<Outlet>` konumunda render edilecek.
+- **Mod:** Mevcut React Router Declarative Mode korunacak. TanStack Query server state sahibi olduğu ve loader/action ihtiyacı bulunmadığı için Data Router veya Framework Mode'a geçilmeyecek.
+- **Navigasyon:** İlk shell navigasyonu için MIT lisanslı, sıfır dependency'li `@phosphor-icons/react@2.1.10` kullanılacak. Geliştirme sırasında binlerce modüllük barrel işleme riskini azaltmak için ikonlar direct path'ten alınacak.
+- **Sınır:** Layout yalnız kalıcı navigasyon, ürün kimliği ve içerik yerleşimini taşır; sahte KPI, müşteri/sevkiyat iş kuralı veya API çağrısı içermez.
+- **Yeniden değerlendirme:** Route-level loader/action, automatic code splitting veya route error-boundary ihtiyacı kanıtlanırsa Data Mode; büyük route sayısı oluşursa lazy route sınırları ayrıca incelenir.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-022.
+
+## D-029 — Ölçülü ve erişilebilir arayüz hareketi
+
+- **Tarih:** 2026-07-05
+- **Durum:** Kabul edildi
+- **Karar:** İlk uygulama kabuğundaki kısa giriş, bağlantı çizimi ve kart üzerine gelme hareketleri mevcut Emotion/CSS altyapısıyla uygulanacak; yalnız görsel etki için yeni animasyon dependency'si eklenmeyecek.
+- **Sınır:** Sürekli dönen, yanıp sönen veya operasyon bilgisinin okunmasını geciktiren hareket kullanılmayacak. Hareket, bilgi hiyerarşisini destekleyecek ve ürün davranışının yerine geçmeyecek.
+- **Erişilebilirlik:** İşletim sistemi veya tarayıcıda azaltılmış hareket isteyen kullanıcılar için `prefers-reduced-motion: reduce` altında giriş ve geçiş hareketleri kapatılacak.
+- **Yeniden değerlendirme:** Sayfalar arası çıkış/giriş koordinasyonu, sürükleme, karmaşık yerleşim geçişi veya CSS ile güvenilir biçimde yönetilemeyen gerçek ürün etkileşimi oluşursa Motion ayrıca değerlendirilecek.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-023.

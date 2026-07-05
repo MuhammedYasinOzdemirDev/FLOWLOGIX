@@ -4,10 +4,10 @@
 
 - **Milestone:** Faz 0 — Bağlam ve çalışma zemini
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
-- **Aktif alt task:** FLOW-001.8e.1 — FlowLogix frontend uygulama kabuğu
+- **Aktif alt task:** FLOW-001.10b — GitHub Actions CI workflow taslağı
 - **Branch:** `feature/FLOW-001-foundation`
-- **Son doğrulanan kaynak commit:** `29c6f4c` — `feat(web): define application provider foundation`
-- **Son repository commit (bu handoff commit'i öncesi):** `be84d7d` — `docs: strengthen frontend collaboration rules`
+- **Son doğrulanan kaynak commit:** `8bb0f8a` — `feat(web): establish operations control shell`
+- **Son repository commit (bu belge commit'i öncesi):** `8bb0f8a` — `feat(web): establish operations control shell`
 
 ## Mevcut repository yapısı
 
@@ -123,6 +123,30 @@
 - Agent sınırlı frontend tooling/config yetkisiyle exact Prettier dependency'sini, `.prettierrc.json`, `.prettierignore`, `format` ve `format:check` script'lerini ekledi. Paket audit'i 0 bilinen açık verdi.
 - İlk `format:check` kaynakları değiştirmeden `AppProviders.tsx` dâhil 14 mevcut dosyada format farkı buldu. FLOW-001.8d.5 ve FLOW-001.8e.1c.2 kullanıcı baseline'ı uygulayıp tüm kapılar doğrulanana kadar açık.
 - Kullanıcı ilk Prettier baseline'ını uyguladı. `AppProviders.tsx` 2 boşluk standardına geldi; format check, lint, Vitest `1/1`, production build, .NET solution build ve backend testleri `2/2` geçti. FLOW-001.8d.5 ve FLOW-001.8e.1c.2 tamamlandı.
+- Kullanıcı `main.tsx` bootstrap'ında DOM root varlığını açıkça doğrulayıp `App` bileşenini `StrictMode` ve `AppProviders` altında bağladı. İlk denemede eksik JSX kapanışı ve nullable root hatası gerçek derleyici çıktısıyla incelendi; düzeltme ve Prettier sonrası FLOW-001.8e.1c.3 ile provider-composition üst işi tamamlandı.
+- R-022/D-028 ile Declarative nested layout route, `Outlet`, Data Router alternatifi ve ilk shell ikon seçenekleri karşılaştırıldı. Path'siz layout route + `AppShell` seçildi; server-state sahibi TanStack Query olarak korundu.
+- Agent sınırlı frontend dependency/config yetkisiyle `@phosphor-icons/react@2.1.10` paketini exact kurdu. Manifest/lockfile/ağaç eşleşti, audit 0 açık ve mevcut format/lint/test/build kapıları yeşil kaldı.
+- Kullanıcı React anlatımlarında dil akışının ve temel component açıklamalarının yetersiz kaldığını bildirdi. React'e yeni başlayan kullanıcı için bütün ekran → parçalar → ilişki → kod → doğrulama sırası AGENTS/PRINCIPLES içine kalıcı kural olarak eklendi.
+- Kullanıcının oluşturduğu `AppShell.tsx` gerçek dosyadan incelendi. MUI v9'da kaldırılan doğrudan `alignItems` system prop'u nedeniyle oluşan `TS2769` giderildi; ancak hizalama değeri henüz `sx` içine taşınmadı ve Prettier kapısı kırmızı. Build, lint ve geçici test yeşil olsa da FLOW-001.8e.1d.3 tamamlanmadı.
+- Kullanıcı `alignItems: 'center'` değerini ilk `Stack` bileşeninin `sx` alanına taşıdı ve formatter'ı çalıştırdı. Dosya yeniden okundu; format, lint, Vitest `1/1` ve production build geçti. FLOW-001.8e.1d.3 tamamlandı.
+- Kullanıcının “route ağacı” gibi açıklanmamış ve iki dili karıştıran ifadeler hakkındaki geri bildirimi AGENTS/PRINCIPLES içine işlendi. Teknik terimler bundan sonra önce doğal Türkçe karşılıkla, gerekiyorsa kaynak koddaki ad parantez içinde verilecek.
+- Kullanıcı `OperationsOverviewPage.tsx` içinde sahte gösterge kullanmayan başlangıç sayfasını oluşturdu. Türkçe karakterlerin dosyada doğru UTF-8 olduğu ayrıca doğrulandı; Prettier sonrasında format, lint, Vitest `1/1`, production build ve whitespace kontrolü geçti. İçerik doğrulandı; klasör sınırı ayrıca incelenecek.
+- Kullanıcı `AppRoutes.tsx` adres eşleme bileşenini doğru biçimde oluşturdu; format, lint, test ve build geçti. Klasör sınırı yeniden incelendiğinde `OperationsOverviewPage` dosyasının ürün özelliği olmasına rağmen `app` altında kaldığı tespit edildi. Sayfa `features/operations-overview` altına taşınmadan FLOW-001.8e.1d.4a ve 4b tamamlanmış sayılmayacak.
+- Kullanıcı `OperationsOverviewPage.tsx` dosyasını `features/operations-overview` altına taşıdı ve `AppRoutes.tsx` içe aktarma yolunu düzeltti. Eski konumda kopya kalmadı; format, lint, Vitest `1/1`, production build ve whitespace kontrolü geçti. FLOW-001.8e.1d.4a–b tamamlandı.
+- Kullanıcı `main.tsx` içinde eski Vite `App` ve `index.css` bağlantılarını kaldırıp `AppRoutes` bileşenini `AppProviders` altında çalıştırdı. Format, lint, Vitest `1/1`, production build ve whitespace kontrolü geçti; production çıktısında eski demo görselleri kalmadı. FLOW-001.8e.1d.4c ve üst adres eşleme işi tamamlandı.
+- Yerel Vite sunucusunda `/` adresi `200 text/html`, React `root` elemanı ve Vite istemcisiyle doğrulandı. Otomatik Chromium görsel denetimi, Playwright'ın geçici çalışma dizini oluşturma yetkisi olmadığı için iki farklı izinli konum denemesinden sonra yapılamadı; görsel kabul kullanıcı tarayıcısında doğrulanacak.
+- Kullanıcının bu tasarım taskına özel kaynak yazma izniyle `theme.ts`, `AppShell.tsx` ve `OperationsOverviewPage.tsx` yeniden tasarlandı. Koyu operasyon rayı, okunaklı çalışma yüzeyi, ürün kapsamını anlatan kahraman alanı, ilk veri zinciri ve sahte gösterge kullanmayan ürün yolu kartları oluşturuldu.
+- Hareket için yeni dependency eklenmedi. Emotion anahtar kareleriyle kısa giriş/geçiş hareketleri kullanıldı; sürekli hareketten kaçınıldı ve `prefers-reduced-motion` tercihinde hareketler kapatıldı.
+- Vite demo kaynakları ve görselleri kaldırıldı; favicon, sayfa dili, başlık ve açıklama FlowLogix'e uyarlandı. Geçici sayaç testi yerine adres eşleme, kalıcı çerçeve ve başlangıç sayfasının görünür kullanıcı sözleşmesini sınayan `AppRoutes.test.tsx` eklendi.
+- Uygulama yerel tarayıcıda 1280×720 masaüstü ve 390×844 telefon görünümünde incelendi. Telefon görünümünde yatay taşma bulunmadı; erişilebilir başlık/bölge yapısı korundu ve tarayıcı konsolunda hata/uyarı görülmedi. Önceki görsel doğrulama blokajı giderildi.
+- Tasarım sonrası format check, type-aware lint, Vitest `1/1`, TypeScript/Vite production build ve whitespace kontrolü başarılı oldu. Vite 369 modül dönüştürdü; JavaScript çıktısı yaklaşık `135.71 kB` gzip oldu. FLOW-001.8e.1 tamamlandı.
+- FLOW-001.8f temiz kurulumunun ilk denemesi, önceki görsel kontrolden açık kalan FlowLogix Vite sürecinin Rolldown yerel dosyasını kilitlemesi nedeniyle Windows `EPERM` hatasıyla durdu. Yalnız bu repository'ye ait npm/Vite süreçleri belirlenip kapatıldı; Visual Studio TypeScript süreçlerine dokunulmadı.
+- İkinci `npm ci` lockfile'dan 303 paketi başarıyla kurdu. Aynı temiz bağımlılık ağacında format check, type-aware lint, Vitest `1/1` ve production build geçti; çıktı tekrar yaklaşık `135.71 kB` gzip oldu. FLOW-001.8f tamamlandı.
+- `AGENTS.md` içindeki artık geçersiz “Vite demo sayaç testi” notu gerçek uygulama kabuğu testiyle eşitlendi ve frontend doğrulama sırasına `format:check` eklendi.
+- FLOW-001.9 repository kapanışında solution restore bütün projeleri güncel buldu. Explicit solution build beş projeyi `0` uyarı ve `0` hatayla derledi; `dotnet test --no-build` iki geçici MSTest/MTP şablon testini başarıyla çalıştırdı.
+- Temiz frontend kurulumu ve kalite kapılarıyla backend restore/build/test sonuçları birlikte değerlendirildi; FLOW-001.9 tamamlandı. İki backend testi hâlâ yalnız test keşif altyapısı kanıtıdır, domain veya gerçek SQL Server davranış testi değildir.
+- FLOW-001.10b öncesinde resmî action release'leri yeniden doğrulandı: checkout `v6.0.3`, setup-dotnet `v5.4.0`, setup-node `v6.4.0`. Workflow tam commit kimliklerini kullanacak; setup-node'un npm otomatik cache davranışı ilk aşamada `package-manager-cache: false` ile kapatılacak.
+- Doğrulanmış frontend uygulama kabuğu, ikon dependency'si, gerçek başlangıç testi ve Vite demo temizliği `8bb0f8a feat(web): establish operations control shell` commit'inde amaç odaklı olarak kaydedildi.
 - Bu oturumda `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; yaşayan frontend belgeleri bu handoff commit'iyle kaydedildi. Push veya merge yapılmadı.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
@@ -136,6 +160,15 @@
 - `tests/FlowLogix.Customers.UnitTests/*`
 - `tests/FlowLogix.Customers.IntegrationTests/*`
 - `src/FlowLogix.Web/*` — resmi Vite `react-ts` scaffold, lockfile ve başlangıç React kaynakları
+
+## Agent tarafından bu tasarım taskında uygulanan kaynak dosyalar
+
+- `src/FlowLogix.Web/src/app/theme.ts` — renk, yazı, genel yüzey ve erişilebilir odak/hareket politikası
+- `src/FlowLogix.Web/src/app/AppShell.tsx` — responsive kalıcı menü, üst başlık ve ana içerik çerçevesi
+- `src/FlowLogix.Web/src/features/operations-overview/OperationsOverviewPage.tsx` — ürün anlatımı, ilk veri zinciri ve ürün yolu
+- `src/FlowLogix.Web/src/app/AppRoutes.test.tsx` — uygulama kabuğunun görünür kullanıcı sözleşmesi
+- `src/FlowLogix.Web/index.html`, `public/favicon.svg` — Türkçe sayfa metadata'sı ve FlowLogix tarayıcı kimliği
+- Eski Vite demo `App`, CSS, test ve görsel kaynakları kaldırıldı.
 
 ## Çalıştırılan doğrulamalar
 
@@ -173,6 +206,15 @@
 - `npm run format:check --prefix .\src\FlowLogix.Web` — beklenen başarısız; 14 mevcut dosya ilk format baseline'ını bekliyor
 - Prettier config kurulumu sonrası `npm run lint`, `npm run test` (1/1) ve `npm run build` — başarılı
 - İlk format baseline'ı sonrası `npm run format:check`, `npm run lint`, `npm run test` (1/1) ve `npm run build` — başarılı
+- AppProviders bootstrap bağlantısı sonrası `npm run format:check`, `npm run lint`, `npm run test` (1/1) ve `npm run build` — başarılı; Vite 238 modül, yaklaşık 111.8 kB gzip JS
+- Phosphor dependency kurulumu sonrası `npm run format:check`, `npm run lint`, `npm run test` (1/1) ve `npm run build` — başarılı; paket source tarafından henüz kullanılmadığı için bundle değişmedi
+- FlowLogix görsel yenilemesi sonrası `npm run format:check`, `npm run lint`, `npm run test` (1/1) ve `npm run build` — başarılı; Vite 369 modül, yaklaşık 135.71 kB gzip JS
+- Yerel tarayıcı denetimi — 1280×720 ve 390×844 görünümler başarılı; telefon görünümünde yatay taşma ve konsol hata/uyarısı yok
+- FLOW-001.8f `npm ci` — ilk deneme açık kalan Vite sürecinin dosya kilidi nedeniyle `EPERM`; süreç kapatıldıktan sonra başarılı, 303 paket kuruldu
+- Temiz kurulum sonrası `npm run format:check`, `npm run lint`, `npm run test` (1/1) ve `npm run build` — tamamı başarılı; Vite 369 modül, yaklaşık 135.71 kB gzip JS
+- FLOW-001.9 `dotnet restore .\FlowLogix.sln` — başarılı; tüm projeler güncel
+- FLOW-001.9 `dotnet build .\FlowLogix.sln --no-restore` — başarılı; 5 proje, 0 uyarı, 0 hata
+- FLOW-001.9 `dotnet test .\FlowLogix.sln --no-build` — başarılı; 2/2 geçici MSTest/MTP şablon testi
 - Commit öncesi `dotnet build .\FlowLogix.sln --no-restore` — başarılı; 5 proje, 0 uyarı, 0 hata
 - Commit öncesi `dotnet test .\FlowLogix.sln --no-build --no-restore` — başarılı; 2/2 geçici test
 
@@ -182,14 +224,14 @@
 - `FlowLogix.Customers.csproj` için çalışma ağacı ve index içerik hash'lerinin aynı olduğu doğrulandı; CRLF/LF stat bilgisi içerik commit'i oluşturmadan yenilendi ve çalışma ağacı temizlendi.
 - `.vs/` ignore kuralı kullanıcı tarafından eklendi ve doğrulandı.
 - İki `Test1.cs` yalnız MTP keşif altyapısını doğrulayan geçici şablon testidir; gerçek domain/integration kapsamı gibi sayılmamalı ve ilk gerçek testlerle değiştirilmelidir.
-- React/Vite scaffold doğru konumda; Router/Query exact sürümle kurulu ve son test/lint/build kapıları yeşil. `test` script'i ve 1 geçici component testi mevcut.
+- React/Vite scaffold doğru konumda; Router/Query exact sürümle kurulu ve son test/lint/build kapıları yeşil. `test` script'i ve uygulama kabuğunu sınayan 1 gerçek component testi mevcut.
 - SQL Server bağlantı biçimi ve development database adı source adımında doğrulanmalı; secret repository'ye yazılmamalı.
 - Paket exact sürümleri kurulum anında resmi kaynak/NuGet/npm üzerinden tekrar doğrulanmalı.
 - GitHub CLI makinede kurulu değil; remote API erişimi mevcut, ancak CLI ile auth/secret/push işlemi yapılamıyor.
 - SonarQube Cloud project import ve `SONAR_TOKEN` oluşturma dış hizmet işlemi olduğundan kullanıcı tarafından yapılmalı.
 - SonarQube Cloud resmi TypeScript tam desteği `5.9.3`; FlowLogix TypeScript 6 frontend analizi açılmadan yeniden doğrulanmalı.
 - API development HTTPS sertifikası trusted; Vite proxy Node process'inin system CA kullanması project `.npmrc` ile uygulandı ve gerçek proxy isteğinde doğrulandı.
-- Prettier format kapısı ve ilk baseline doğrulandı; format check yeşil. Geçici Vite demo ekranı/testi gerçek uygulama kabuğu kurulunca değiştirilmeli.
+- Prettier format kapısı ve ilk baseline doğrulandı; format check yeşil. Vite demo ekranı, testi ve kullanılmayan görselleri kaldırıldı.
 - Word belgesinin görsel render kontrolü ortamda LibreOffice bulunmadığı için yapılamadı; içerik OOXML ve metin/tablo çıkarımıyla okundu.
 
 ## Alınan kararlar
@@ -205,7 +247,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-FLOW-001.8e.1c.3 kapsamında kullanıcı `src/FlowLogix.Web/src/main.tsx` bootstrap'ını `AppProviders` üzerinden bağlayacak; başlamadan önce iş amacı, React root/provider çalışma sırası, dosya ve eksiksiz küçük kod adımı öğretici biçimde anlatılacak.
+FLOW-001.10b için PR ve `main` push tetikleyicili, en az yetkili GitHub Actions CI dosyasının amacı, her adımı ve güvenlik sınırları kullanıcıya öğretici biçimde anlatılacak; ardından kullanıcı workflow dosyasını oluşturacak.
 
 ## Yeni sohbet okuma sırası
 

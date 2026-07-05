@@ -37,12 +37,11 @@
 
 ## Sıradaki öğrenme hedefi
 
-FLOW-001 source adımında:
+FLOW-001 GitHub Actions adımında:
 
-- `.sln`, `.csproj` ve project reference farkı
-- Modül başına tek proje tercihinin maliyet/faydası
-- `global.json` ile SDK sabitleme
-- CLI üzerinden tekrarlanabilir restore/build
+- CI workflow, job ve step kavramlarının birbirinden farkı
+- En az yetki, action SHA sabitleme ve dependency cache güvenliği
+- Yerelde geçen backend/frontend komutlarının CI ortamında aynı sırayla tekrarlanması
 
 ## L-006 — İyi mimari en fazla pattern değil, doğru değişim maliyetidir
 
@@ -231,3 +230,62 @@ FLOW-001 source adımında:
 - **Tasarım etkisi:** Prettier ve ESLint ayrı script'lerde kalır. Böylece biçim farkı ile gerçek kod kalitesi uyarısı birbirine karışmaz.
 - **Doğrulama:** Exact `prettier@3.9.1` kuruldu; ilk `format:check` 14 eski dosyada baseline farkını yakaladı. Kullanıcı baseline'ı uyguladıktan sonra format check, lint, Vitest `1/1` ve production build birlikte geçti.
 - **Yaygın hata:** `.editorconfig` bulunduğu için eski dosyaların Ctrl+S ile otomatik yeniden yazılacağını veya lint yeşilken formatın da doğru olduğunu varsaymak.
+
+## L-028 — React bootstrap ortak altyapının uygulamaya giriş kapısıdır
+
+- **Bağlam:** FLOW-001.8e.1c.3 React bootstrap ve provider composition
+- **Başlangıç seviyesi:** Provider'ları yazmak, elektrik tesisatını hazırlamaktır; `main.tsx` içinde uygulamayı onlarla sarmak ise ana şalteri bağlar. Altındaki bütün ekranlar ancak bundan sonra tema, Router ve Query context'ine erişir.
+- **React davranışı:** `createRoot`, `index.html` içindeki DOM elemanını React ağacının kökü yapar. `StrictMode` development'ta güvenli olmayan render/Effect davranışlarını görünür kılmak için bazı çalışmaları tekrar edebilir; production ağacını çift çalıştırmaz.
+- **TypeScript davranışı:** `getElementById` sonucu `HTMLElement | null` olur. Açık `if (!rootElement) throw` kontrolü control-flow narrowing yapar; `!` non-null assertion gibi yalnız derleyiciyi susturmak yerine runtime varsayımını da doğrular.
+- **JSX davranışı:** `<AppProviders>...</AppProviders>` çocuk taşıyan açılış/kapanış çiftidir; `<AppProviders />` ise ayrı ve çocuksuz bir kullanım demektir. Girinti runtime semantiğini değiştirmez ancak ağaç yapısını insanlar için görünür kılar; Prettier bu nedenle ayrı kalite kapısıdır.
+- **Bundle etkisi:** Provider'lar bootstrap'a bağlanınca MUI, Router ve Query production graph'ına gerçekten girdi; Vite `238` modül ve yaklaşık `111.8 kB` gzip JS raporladı. Bu beklenen foundation maliyetidir; ölçülmüş bütçe sorunu olmadan erken optimizasyon yapılmaz.
+- **Doğrulama:** Format check, type-aware ESLint, Vitest `1/1` ve Vite production build birlikte geçti.
+- **Yaygın hata:** Provider dosyasının var olmasını etkin sanmak, `null` olasılığını assertion ile gizlemek veya development StrictMode tekrarını production duplicate-request davranışı sanmak.
+
+## L-029 — MUI yerleşim bileşenleri görevlerine göre ayrılır
+
+- **Bağlam:** FLOW-001.8e.1d.3 kalıcı operasyon çerçevesi
+- **Başlangıç seviyesi:** `Box`, genel amaçlı bir yerleşim kutusudur; HTML `div` öğesine benzer ve MUI temasını kullanabilir. `Stack`, doğrudan içindeki bileşenleri yatay veya dikey sıraya dizer. `sx`, görünüm kurallarının yazıldığı MUI stil alanıdır.
+- **Yerleşim davranışı:** `direction="row"` logo ile yazıyı yan yana getirir; `spacing` aralarındaki boşluğu belirler; `alignItems: 'center'` bunları dikey eksende ortalar.
+- **MUI v9 davranışı:** `direction` ve `spacing`, `Stack` bileşeninin kendi özellikleridir. `alignItems` gibi genel görünüm kuralları MUI v9'da doğrudan özellik olmaktan çıkarılmıştır ve `sx` içinde yazılır.
+- **TypeScript etkisi:** Geçersiz `alignItems` özelliği önce varsayılan `Stack` imzasını bozdu; TypeScript daha sonra başka imzaları da deneyerek yanıltıcı görünen “component eksik” ayrıntısını gösterdi. Asıl hata mesajın son bölümündeydi.
+- **Doğrulama:** Hizalama `sx` içine taşındıktan sonra format, type-aware lint, Vitest `1/1` ve production build birlikte geçti.
+- **Yaygın hata:** Derlemenin başarılı olmasını görsel davranışın da doğru olduğu kanıtı saymak veya uzun overload mesajında yalnız ilk satıra bakmak.
+
+## L-030 — Uygulama kurulumu ile ürün özellikleri aynı klasörde toplanmaz
+
+- **Bağlam:** FLOW-001.8e.1d.4a–b frontend klasör sınırı
+- **Başlangıç seviyesi:** `app`, uygulamanın parçalarını bir araya getiren merkezdir; `features`, kullanıcının yaptığı işlere ait sayfa ve davranışları taşır. Her dosyayı `app` içine koymak, zamanla sorumluluğu belirsiz bir klasör oluşturur.
+- **Sınır:** `AppRoutes`, `AppShell`, sağlayıcılar, tema ve tek QueryClient örneği uygulama genelini kurduğu için `app` altında kalır. Operasyon genel bakışı, müşteri veya sevkiyat gibi ürün kavramları `features` altında bulunur.
+- **Bağımlılık yönü:** `app`, özellikleri bir araya getirebilir; ürün özellikleri uygulamanın başlangıç ayrıntılarına bağımlı olmaz. Gerçekten ortak teknik parçalar oluştuğunda `shared` kullanılır; önceden boş klasör açılmaz.
+- **Dosya yolu öğrenimi:** `./` mevcut klasörü, `../` bir üst klasörü gösterir. Dosya taşındıktan sonra eski göreli yol lint ve kullanılmayan geçici test tarafından yakalanmadı; bütün TypeScript kaynaklarını denetleyen build `TS2307` verdi.
+- **Doğrulama:** Sayfa `features/operations-overview` altına taşındı, `AppRoutes` içe aktarma yolu güncellendi ve format/lint/test/build birlikte geçti.
+- **Yaygın hata:** Teknik kontroller yeşil diye klasör sorumluluğunu incelememek veya henüz ortak kullanım oluşmadan `shared` klasörünü genel depoya çevirmek.
+
+## L-031 — İyi hareket dikkati yönlendirir, sürekli dikkat istemez
+
+- **Bağlam:** FLOW-001.8e.1d.5 FlowLogix görsel yenilemesi
+- **Başlangıç seviyesi:** Animasyon, ekrandaki parçaların nereden geldiğini veya hangi kartın etkileşimli olduğunu kısa süreyle anlatan bir yön levhası gibi çalışır. Sürekli hareket eden bir ekran ise yön göstermek yerine dikkati tüketir.
+- **Uygulama davranışı:** Emotion `keyframes`, ilk görünümde opaklık ve dikey konumu kısa süre içinde değiştirir. Kart üzerine gelme geçişleri yalnız işaretçi kullanan etkileşimde geri bildirim verir; uygulama durumunu veya iş kuralını değiştirmez.
+- **Erişilebilirlik:** `prefers-reduced-motion`, kullanıcının işletim sistemi düzeyindeki hareket azaltma tercihini CSS'e taşır. FlowLogix bu tercih etkin olduğunda giriş ve hover hareketlerini kapatır.
+- **Test ayrımı:** Vitest, kalıcı çerçevenin ve ürün metninin DOM'da bulunduğunu doğrular; gerçek tarayıcı incelemesi ise taşma, hizalama, okunabilirlik ve konsol sorunlarını kontrol eder. Bu iki kanıt birbirinin yerine geçmez.
+- **Doğrulama:** 1280×720 ve 390×844 tarayıcı görünümlerinde yerleşim incelendi; telefon görünümünde yatay taşma, iki görünümde de konsol hata/uyarısı bulunmadı. Format, lint, Vitest `1/1` ve production build geçti.
+- **Yaygın hata:** “Havalı” görünüm uğruna sürekli animasyon eklemek, yalnız renkle durum anlatmak veya build başarılı olduğu için responsive görünümü kontrol edilmiş saymak.
+
+## L-032 — Temiz kurulum lockfile sözleşmesini ve ortam kilitlerini görünür kılar
+
+- **Bağlam:** FLOW-001.8f frontend kapanış doğrulaması
+- **Başlangıç seviyesi:** Normal geliştirme sırasında paketler uzun süre aynı klasörde kalabilir. `npm ci`, depoyu yeni açmış bir geliştirici gibi mevcut paket klasörünü temizler ve yalnız kilit dosyasındaki kesin sürümleri yeniden kurar.
+- **npm davranışı:** `npm ci`, `package.json` ile `package-lock.json` uyuşmazsa durur ve bağımlılık sürümlerini yeniden seçmez. Bu nedenle tekrarlanabilir yerel geliştirme ve CI için daha güçlü bir kapanış kanıtıdır.
+- **Windows etkisi:** Çalışan Vite süreci yerel Rolldown dosyasını kullanımda tuttuğu için ilk temizlik `EPERM` ile durdu. Hata dependency uyumsuzluğu değildi; yalnız FlowLogix geliştirme süreçleri kapatıldığında aynı komut başarılı oldu.
+- **Doğrulama:** Temiz kurulum 303 paketi yeniden kurdu; ardından format check, type-aware lint, Vitest `1/1` ve production build birlikte geçti.
+- **Yaygın hata:** `EPERM` hatasını otomatik olarak bozuk lockfile sanmak, tüm Node/Visual Studio süreçlerini gelişigüzel kapatmak veya temiz kurulumdan sonra kalite kapılarını yeniden çalıştırmamak.
+
+## L-033 — Test komutu explicit solution build'in yerine geçmez
+
+- **Bağlam:** FLOW-001.9 repository restore/build/test kapanışı
+- **Başlangıç seviyesi:** Restore gerekli paketleri hazırlar, build bütün projelerin derlenebilirliğini denetler, test ise yalnız test projelerinin keşfettiği senaryoları çalıştırır. Üçü aynı işi yapmaz.
+- **Dependency graph etkisi:** API projesi mevcut test projelerinin bağımlılık zincirinde bulunmayabilir. Yalnız `dotnet test` çalıştırmak bu nedenle API'nin güncel kaynakla derlendiğini kanıtlamaz; explicit solution build korunur.
+- **Kanıt sınırı:** Mevcut iki backend testi şablon keşif testidir. `2/2` sonucu MSTest/MTP hattının çalıştığını gösterir; müşteri domain kuralları, migration, SQL persistence veya auth davranışı hakkında kanıt üretmez.
+- **Doğrulama:** Restore güncel tamamlandı; beş proje `0` uyarı ve `0` hatayla derlendi; iki şablon testi geçti. Temiz frontend kurulumundaki dört kalite kapısıyla birlikte FLOW-001.9 kapandı.
+- **Yaygın hata:** Testler geçtiğinde solution'daki bütün projelerin derlendiğini veya test sayısı bulunduğunda gerçek ürün davranışının sınandığını varsaymak.

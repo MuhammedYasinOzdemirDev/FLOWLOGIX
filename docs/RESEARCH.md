@@ -605,6 +605,18 @@ TypeScript `6.0.3` güncel kararlı sürümdür. Buna karşılık SonarQube Clou
 
 Öneri: FlowLogix'i yalnız analiz aracı geride kaldığı için TypeScript 5.9'a düşürmemek. İlk Sonar adımında `sonar.scanner.scanAll=false` ile C# kapsamını güvenilir tutmak; Sonar TypeScript 6 desteği açıkça doğrulandığında multi-language taramayı ve frontend coverage'ını etkinleştirmek. Yarınki frontend sürüm kararı bu uyumluluk notuyla birlikte tekrar değerlendirilecek.
 
+### 2026-07-05 action sürümü ve tam commit doğrulaması
+
+FLOW-001.10b öncesinde resmî release sayfaları yeniden incelendi:
+
+| Action | Doğrulanan release | Workflow'da kullanılacak tam commit |
+|---|---:|---|
+| `actions/checkout` | `v6.0.3` | `df4cb1c069e1874edd31b4311f1884172cec0e10` |
+| `actions/setup-dotnet` | `v5.4.0` | `26b0ec14cb23fa6904739307f278c14f94c95bf1` |
+| `actions/setup-node` | `v6.4.0` | `48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e` |
+
+`setup-node` v6, `package.json` içinde npm `packageManager` alanı bulunduğunda npm cache'ini varsayılan olarak açabilir. FlowLogix ilk CI adımında ölçülmemiş cache davranışı istemediği için `package-manager-cache: false` değerini açıkça kullanacak. Node sürümü kök `.nvmrc`, .NET SDK ise kök `global.json` üzerinden okunacak.
+
 ### Kaynaklar
 
 - [GitHub — Building and testing .NET](https://docs.github.com/en/actions/tutorials/build-and-test-code/net)
@@ -965,3 +977,59 @@ Prettier'ın resmi kurulum rehberi exact, proje-yerel sürüm kullanılmasını;
 - [Prettier — Editor integration](https://prettier.io/docs/editors/)
 - [typescript-eslint — What About Formatting?](https://typescript-eslint.io/users/what-about-formatting/)
 - [Biome — Formatter ve Prettier uyumluluğu](https://biomejs.dev/)
+
+## R-022 — React route/layout kabuğu ve shell ikon politikası
+
+**Tarih:** 2026-07-05
+
+**Durum:** Tamamlandı
+
+FlowLogix React Router `8.0.1` Declarative Mode kullanıyor ve server state sahipliği TanStack Query'de. İlk kalıcı operasyon kabuğunda URL eşlemesi, ortak layout ve iş sayfası sorumluluklarının birbirine karışmaması gerekiyor.
+
+### Route yaklaşımı karşılaştırması
+
+| Seçenek | Güçlü taraf | FlowLogix etkisi | Sonuç |
+|---|---|---|---|
+| Her route içinde shell tekrar etmek | İlk bakışta basit | Navigasyon/header tekrarı ve tutarsız responsive davranış | Seçilmedi |
+| Declarative nested layout route + `Outlet` | Mevcut BrowserRouter ile uyumlu; ortak shell tek yerde | Loader/action ve route-module code splitting sağlamaz | Seçildi |
+| Data Router `createBrowserRouter` | Loader, action, route error boundary ve lazy route araçları | Query ile server-state sahipliği çakışabilir; bugün kullanılmayan API yüzeyi | Ertelendi |
+| Framework/file routes | Otomatik route modules ve conventions | Vite SPA temelini yeniden araçlandırır | MVP foundation için seçilmedi |
+
+Resmî Declarative Mode rehberine göre `<Routes>` mevcut konuma uyan route dalını seçer. Path'siz layout route URL segmenti eklemeden çocukları ortak layout altında toplar. Parent layout içindeki `<Outlet>`, eşleşen index veya child route'un render noktasıdır. Bu nedenle `AppShell` route bilgisini veya feature iş mantığını sahiplenmeyecek; yalnız kalıcı operasyon çerçevesi olacaktır.
+
+### İkon karşılaştırması
+
+- MUI kullanmak Material Icons paketini zorunlu kılmaz; ayrı bir dependency ve ayrı görsel dildir.
+- `react-icons` çok sayıda ikon ailesini tek paket altında toplar; FlowLogix tek ve tutarlı bir aile istediği için gereksiz genişlik yaratır.
+- `@phosphor-icons/react@2.1.10` MIT lisanslı, sıfır runtime dependency'li ve tree-shaking destekli. Duotone ağırlığı Operasyon Kontrol Kulesi diline uyar.
+- Phosphor dokümanı ana package barrel import'unun bazı bundler'larda geliştirme sırasında 9.000'den fazla modülü işleyebileceğini belirtiyor. FlowLogix bu nedenle `@phosphor-icons/react/dist/csr/IconName` direct-path import biçimini kullanacak.
+
+Kurulum sonrası manifest, lockfile ve `npm ls` exact `2.1.10` sürümünde eşleşti; audit 0 bilinen açık verdi. Paket henüz source tarafından import edilmediği için production bundle boyutu değişmedi.
+
+### Kaynaklar
+
+- [React Router — Declarative routing](https://reactrouter.com/start/declarative/routing)
+- [React Router — Outlet](https://api.reactrouter.com/v7/functions/react-router.Outlet.html)
+- [React Router — Route](https://reactrouter.com/api/components/Route)
+- [Phosphor React — npm ve import performansı](https://www.npmjs.com/package/%40phosphor-icons/react)
+- [Phosphor React — GitHub ve MIT lisansı](https://github.com/phosphor-icons/react)
+
+## R-023 — Başlangıç kabuğunda hareket ve azaltılmış hareket tercihi
+
+**Tarih:** 2026-07-05
+
+**Durum:** Tamamlandı
+
+FlowLogix başlangıç sayfasında bilgi hiyerarşisini güçlendiren kısa hareketlere ihtiyaç vardır; ancak bu gereksinim tek başına yeni bir animasyon kütüphanesini haklı çıkarmaz. Mevcut Emotion altyapısı anahtar kare, geçiş ve medya sorgusu desteğini zaten sağlar.
+
+| Seçenek | Güçlü taraf | Bu aşamadaki maliyet | Sonuç |
+|---|---|---|---|
+| CSS/Emotion anahtar kareleri ve geçişleri | Mevcut dependency ile kısa giriş/hover hareketleri; doğrudan azaltılmış hareket desteği | Karmaşık sayfa geçişleri ve sürükleme için sınırlı | Seçildi |
+| Motion | Yerleşim, çıkış/giriş ve gesture koordinasyonunda güçlü | İlk kabukta kullanılmayan runtime/API yüzeyi | Gerçek etkileşim ihtiyacına ertelendi |
+| Hareket kullanmamak | En düşük uygulama maliyeti | Bilgi akışı ve etkileşim geri bildirimi daha zayıf | Tümüyle seçilmedi |
+
+MDN'ye göre `prefers-reduced-motion: reduce`, kullanıcının zorunlu olmayan hareketi azaltma isteğini bildirir. FlowLogix bu nedenle ilk görünüm ve hover dönüşümlerini ilgili medya sorgusunda kapatır. Hareketler kısa tutulur; sürekli animasyon, yanıp sönme ve okunabilirliği geciktiren geçiş kullanılmaz.
+
+### Kaynak
+
+- [MDN — prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion)
