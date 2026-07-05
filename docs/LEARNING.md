@@ -37,11 +37,11 @@
 
 ## Sıradaki öğrenme hedefi
 
-FLOW-001 GitHub Actions adımında:
+FLOW-001 ilk uzak CI doğrulamasında:
 
-- CI workflow, job ve step kavramlarının birbirinden farkı
-- En az yetki, action SHA sabitleme ve dependency cache güvenliği
-- Yerelde geçen backend/frontend komutlarının CI ortamında aynı sırayla tekrarlanması
+- Yerel başarı ile GitHub-hosted Ubuntu runner başarısının farkı
+- Workflow run, job ve check sonuçlarının GitHub üzerinde okunması
+- İlk başarılı koşudan sonra required check adlarının belirlenmesi
 
 ## L-006 — İyi mimari en fazla pattern değil, doğru değişim maliyetidir
 
@@ -289,3 +289,23 @@ FLOW-001 GitHub Actions adımında:
 - **Kanıt sınırı:** Mevcut iki backend testi şablon keşif testidir. `2/2` sonucu MSTest/MTP hattının çalıştığını gösterir; müşteri domain kuralları, migration, SQL persistence veya auth davranışı hakkında kanıt üretmez.
 - **Doğrulama:** Restore güncel tamamlandı; beş proje `0` uyarı ve `0` hatayla derlendi; iki şablon testi geçti. Temiz frontend kurulumundaki dört kalite kapısıyla birlikte FLOW-001.9 kapandı.
 - **Yaygın hata:** Testler geçtiğinde solution'daki bütün projelerin derlendiğini veya test sayısı bulunduğunda gerçek ürün davranışının sınandığını varsaymak.
+
+## L-034 — CI yerel komutların temiz ve tekrarlanabilir uzak kapısıdır
+
+- **Bağlam:** FLOW-001.10b–d ilk GitHub Actions workflow'u
+- **Başlangıç seviyesi:** Workflow bütün otomasyon tarifidir; job ayrı bir sanal makinede çalışan iş grubu, step ise o işteki tek komuttur. Backend ve frontend ayrı job olduğu için birbirini beklemeden çalışabilir.
+- **Güvenlik:** `permissions: contents: read` workflow'un repository'ye yazmasını engeller. `pull_request_target` kullanılmaz; dış katkı koduna ayrıcalıklı bağlam verilmez. Hazır action'lar değişebilen major etiket yerine doğrulanmış tam commit kimliğine sabitlenir.
+- **Tekrarlanabilirlik:** .NET sürümü `global.json`, Node sürümü `.nvmrc`, frontend paketleri `package-lock.json` üzerinden belirlenir. NuGet ve npm cache ölçülmüş ihtiyaç olmadan açılmaz.
+- **Yerel/uzak sınırı:** Workflow komutlarının Windows'ta geçmesi güçlü bir ön kontroldür; GitHub'ın `ubuntu-latest` runner'ındaki action indirme, Linux dosya sistemi ve gerçek event bağlamını kanıtlamaz. İlk remote koşu görülmeden required check açılmaz.
+- **Doğrulama:** YAML Prettier ve LF kontrolünden geçti. Backend Release restore/build/test ile frontend temiz kurulum/format/lint/test/build komutlarının tamamı yerelde başarılı oldu.
+- **Yaygın hata:** Yerel başarıyı remote workflow başarısı saymak, workflow'a gereksiz yazma yetkisi vermek, değişken action etiketi kullanmak veya frontend format kontrolünü CI dışında bırakmak.
+
+## L-035 — Tam commit sabitlemesi güncelleme politikasını ortadan kaldırmaz
+
+- **Bağlam:** FLOW-001.10e Dependabot GitHub Actions politikası
+- **Başlangıç seviyesi:** Tam commit kimliği action kodunu belirli bir noktada kilitler; bu güvenilirlik sağlar fakat yeni düzeltmeleri kendiliğinden getirmez. Dependabot yeni sürümü doğrudan uygulamak yerine incelenebilir bir pull request önerir.
+- **Kapsam:** `package-ecosystem: github-actions` yalnız `.github/workflows` içindeki dış action referanslarını izler. npm ve NuGet dependency'leri bu taskın kapsamına alınmadı.
+- **Bakım dengesi:** Haftalık kontrol günlük PR gürültüsünü azaltır. Üç açık PR sınırı mevcut üç action'ı görünür tutar; güncellemeleri gruplamamak her action'ın release notunu ve CI etkisini ayrı incelemeyi sağlar.
+- **Güvenlik sınırı:** Dependabot PR'ları otomatik merge edilmez. Tam SHA değişimi, sürüm açıklaması, release notları ve CI sonucu kullanıcı tarafından incelenir.
+- **Doğrulama:** `dependabot.yml` ve `ci.yml` Prettier/YAML biçiminden geçti; her iki dosya LF standardında. FLOW-001.10e tamamlandı.
+- **Yaygın hata:** SHA sabitlemesini “artık bakım gerekmez” sanmak, bütün ekosistemleri tek seferde açıp PR gürültüsü üretmek veya CI sonucu görülmeden bot PR'ını otomatik birleştirmek.

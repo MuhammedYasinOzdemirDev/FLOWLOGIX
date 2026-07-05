@@ -617,6 +617,19 @@ FLOW-001.10b öncesinde resmî release sayfaları yeniden incelendi:
 
 `setup-node` v6, `package.json` içinde npm `packageManager` alanı bulunduğunda npm cache'ini varsayılan olarak açabilir. FlowLogix ilk CI adımında ölçülmemiş cache davranışı istemediği için `package-manager-cache: false` değerini açıkça kullanacak. Node sürümü kök `.nvmrc`, .NET SDK ise kök `global.json` üzerinden okunacak.
 
+### 2026-07-05 Dependabot Actions değerlendirmesi
+
+Tam commit kimliği action tedarik zincirini sabitler; fakat yeni güvenlik ve hata düzeltmelerini kendiliğinden almaz. GitHub'ın resmî dokümanına göre Dependabot `github-actions` ekosistemi, workflow içindeki tag veya commit referanslarını izleyebilir. Tam commit kimliğinin yanındaki `# v6.0.3` gibi sürüm açıklaması aynı satırdaysa bu açıklamayı da günceller.
+
+FlowLogix için seçilen başlangıç politikası:
+
+- Yalnız `github-actions` ekosistemi izlenecek; npm ve NuGet dependency güncellemeleri ayrı task kararıdır.
+- `directory: "/"`, `.github/workflows` altındaki action referanslarını taratacak.
+- Kontrol haftalık, pazartesi `06:00 Europe/Istanbul` zamanında yapılacak.
+- En fazla üç version-update PR'ı açık tutulacak; bu sayı mevcut üç action ile sınırlı ve görünür bir bakım kuyruğu sağlar.
+- Üç action tek grupta birleştirilmeyecek. Her action'ın release notu, tam commit değişimi ve CI sonucu bağımsız incelenecek.
+- Dependabot PR'ları otomatik merge edilmeyecek; CI geçişi ve release notu incelemesi sonrasında kullanıcı kararıyla birleştirilecek.
+
 ### Kaynaklar
 
 - [GitHub — Building and testing .NET](https://docs.github.com/en/actions/tutorials/build-and-test-code/net)
@@ -624,6 +637,8 @@ FLOW-001.10b öncesinde resmî release sayfaları yeniden incelendi:
 - [GitHub — `actions/checkout`](https://github.com/actions/checkout)
 - [GitHub — `actions/setup-dotnet`](https://github.com/actions/setup-dotnet)
 - [GitHub — Dependabot version updates](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-version-updates)
+- [GitHub — Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
+- [GitHub — Dependabot supported ecosystems](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories)
 - [Sonar — SonarQube Cloud subscription plans](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/subscription-plans)
 - [Sonar — GitHub Actions CI-based analysis](https://docs.sonarsource.com/sonarcloud/advanced-setup/ci-based-analysis/github-actions-for-sonarcloud)
 - [Sonar — SonarScanner for .NET configuration and multi-language analysis](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/ci-based-analysis/sonarscanner-for-dotnet/configuring)

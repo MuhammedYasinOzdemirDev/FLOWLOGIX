@@ -84,10 +84,10 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
 - [x] FLOW-001.9 — Restore/build sonuçlarını agent doğrulasın
 - [ ] FLOW-001.10 — Frontend yerel kapısı da yeşil olduktan sonra GitHub Actions CI akışını ekle
   - [x] FLOW-001.10a — CI alternatiflerini, güncel official action hattını ve güvenlik kurallarını araştır
-  - [ ] FLOW-001.10b — PR ve `main` push tetikleyicili, read-only permission'lı CI workflow taslağını kullanıcı oluştursun
-  - [ ] FLOW-001.10c — Backend restore/build/test adımlarını `global.json` ile aynı SDK üzerinde çalıştır
-  - [ ] FLOW-001.10d — Frontend `npm ci`, lint, test ve build adımlarını lockfile üzerinden çalıştır
-  - [ ] FLOW-001.10e — Actions'ı full commit SHA ile pinle ve Dependabot Actions güncellemesini değerlendir
+  - [x] FLOW-001.10b — PR ve `main` push tetikleyicili, read-only permission'lı CI workflow taslağını kullanıcı oluştursun
+  - [x] FLOW-001.10c — Backend restore/build/test adımlarını `global.json` ile aynı SDK üzerinde çalıştır
+  - [x] FLOW-001.10d — Frontend `npm ci`, lint, test ve build adımlarını lockfile üzerinden çalıştır
+  - [x] FLOW-001.10e — Actions'ı full commit SHA ile pinle ve Dependabot Actions güncellemesini değerlendir
   - [ ] FLOW-001.10f — İlk remote workflow sonucunu incelemeden required check/branch protection açma
 - [ ] FLOW-001.11 — SonarQube Cloud statik analizini aşamalı kur
   - [x] FLOW-001.11a — SonarQube Cloud, self-hosted Server ve GitHub-native alternatifleri karşılaştır

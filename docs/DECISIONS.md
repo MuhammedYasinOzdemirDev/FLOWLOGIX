@@ -176,6 +176,7 @@
 - **Durum:** GitHub Actions kabul edildi; SonarQube Cloud aktivasyonu kullanıcı onayı/account işlemi bekliyor
 - **CI kararı:** Frontend scaffold ve lockfile sonrası, local backend/frontend komutlarını `pull_request` ve `main` push üzerinde çalıştıran GitHub Actions workflow'u eklenecek.
 - **Güvenlik:** Workflow varsayılan read-only permission kullanacak, `pull_request_target` kullanmayacak, third-party action'lar doğrulanmış full commit SHA ile pinlenecek ve secret tracked dosyaya yazılmayacak.
+- **Action güncellemeleri:** Tam commit kimlikleri haftalık Dependabot `github-actions` kontrolüyle izlenecek; en fazla üç ayrı güncelleme PR'ı açılacak. Güncellemeler gruplanmayacak veya otomatik merge edilmeyecek.
 - **Sonar önerisi:** Public FlowLogix repository için self-hosted SonarQube Server yerine SonarQube Cloud Free kullanılacak; server/DB/backup/upgrade işletim yükü alınmayacak.
 - **Uyumluluk:** TypeScript 6 kararlı kalacak. Sonar resmi desteği TS6'yı kapsayana kadar ilk analiz C# ile sınırlandırılacak; analiz aracı uğruna frontend 5.9'a düşürülmeyecek.
 - **Coverage:** Gerçek testler oluşmadan coverage quality gate bloklaması yapılmayacak. Coverage üretimi Sonar'ın işi değildir; uygun test aracıyla rapor üretildikten sonra import edilecek.

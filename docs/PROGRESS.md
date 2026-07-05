@@ -4,10 +4,10 @@
 
 - **Milestone:** Faz 0 — Bağlam ve çalışma zemini
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
-- **Aktif alt task:** FLOW-001.10b — GitHub Actions CI workflow taslağı
+- **Aktif alt task:** FLOW-001.10f — İlk uzak workflow koşusunu doğrula
 - **Branch:** `feature/FLOW-001-foundation`
 - **Son doğrulanan kaynak commit:** `8bb0f8a` — `feat(web): establish operations control shell`
-- **Son repository commit (bu belge commit'i öncesi):** `8bb0f8a` — `feat(web): establish operations control shell`
+- **Son repository commit (bu belge commit'i öncesi):** `bd882ad` — `ci: add build and action update automation`
 
 ## Mevcut repository yapısı
 
@@ -147,6 +147,15 @@
 - Temiz frontend kurulumu ve kalite kapılarıyla backend restore/build/test sonuçları birlikte değerlendirildi; FLOW-001.9 tamamlandı. İki backend testi hâlâ yalnız test keşif altyapısı kanıtıdır, domain veya gerçek SQL Server davranış testi değildir.
 - FLOW-001.10b öncesinde resmî action release'leri yeniden doğrulandı: checkout `v6.0.3`, setup-dotnet `v5.4.0`, setup-node `v6.4.0`. Workflow tam commit kimliklerini kullanacak; setup-node'un npm otomatik cache davranışı ilk aşamada `package-manager-cache: false` ile kapatılacak.
 - Doğrulanmış frontend uygulama kabuğu, ikon dependency'si, gerçek başlangıç testi ve Vite demo temizliği `8bb0f8a feat(web): establish operations control shell` commit'inde amaç odaklı olarak kaydedildi.
+- Kullanıcı `.github/workflows/ci.yml` dosyasını oluşturdu. Workflow; pull request ve yalnız `main` push tetikleyicileri, `contents: read`, eşzamanlı eski koşu iptali, ayrı Backend/Frontend işleri ve 10 dakikalık iş zaman aşımı içeriyor.
+- Workflow YAML'ı ilk kayıtta 67 CRLF ve 1 LF satır sonuyla Prettier kapısını geçemedi. Kullanıcı dosyayı Prettier ile biçimlendirdi; son durumda 68/68 satır LF, YAML biçimi ve whitespace kontrolü başarılı.
+- Üç resmî action doğrulanmış tam commit kimliğiyle sabitlendi: checkout `v6.0.3`, setup-dotnet `v5.4.0`, setup-node `v6.4.0`. Node npm otomatik cache davranışı `package-manager-cache: false` ile bilinçli olarak kapalı.
+- Backend workflow komutları yerelde birebir çalıştırıldı: restore başarılı; Release solution build 5 projede `0` uyarı/`0` hata; Release testler `2/2` başarılı. Frontend workflow komutları temiz `npm ci` sonrasında format check, lint, Vitest `1/1` ve production build olarak tamamı başarılı.
+- FLOW-001.10b–d yerel kanıtla tamamlandı. GitHub-hosted Ubuntu runner sonucu henüz görülmedi; action güncelleme/Dependabot politikası ve ilk remote koşu beklediği için FLOW-001.10 üst işi açık.
+- Dependabot `github-actions` desteği resmî GitHub belgelerinden doğrulandı. Yalnız action referanslarını pazartesi 06:00 Europe/Istanbul saatinde haftalık kontrol eden, en fazla üç ayrı PR açan ve otomatik merge yapmayan başlangıç politikası seçildi; npm/NuGet kapsamı bu adıma eklenmedi.
+- Kullanıcı `.github/dependabot.yml` dosyasını oluşturdu. İlk kayıttaki CRLF satır sonları Prettier ile LF'ye çevrildi; son durumda iki GitHub YAML dosyası Prettier, whitespace ve LF kontrollerinden geçti.
+- Dependabot config'i yalnız `github-actions`, kök dizin taraması, haftalık pazartesi 06:00 Europe/Istanbul ve en fazla üç açık PR sınırı içeriyor. Action SHA sabitlemesi ve bakım politikası birlikte doğrulandı; FLOW-001.10e tamamlandı.
+- Doğrulanmış CI workflow ve Dependabot Actions politikası `bd882ad ci: add build and action update automation` commit'inde ayrı altyapı değişikliği olarak kaydedildi.
 - Bu oturumda `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; yaşayan frontend belgeleri bu handoff commit'iyle kaydedildi. Push veya merge yapılmadı.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
@@ -215,6 +224,9 @@
 - FLOW-001.9 `dotnet restore .\FlowLogix.sln` — başarılı; tüm projeler güncel
 - FLOW-001.9 `dotnet build .\FlowLogix.sln --no-restore` — başarılı; 5 proje, 0 uyarı, 0 hata
 - FLOW-001.9 `dotnet test .\FlowLogix.sln --no-build` — başarılı; 2/2 geçici MSTest/MTP şablon testi
+- CI workflow Prettier/YAML biçim kontrolü — başarılı; 68 LF, 0 CRLF ve whitespace hatası yok
+- CI backend eşdeğeri `dotnet restore`, `dotnet build --configuration Release --no-restore`, `dotnet test --configuration Release --no-build --no-restore` — başarılı; 5 proje, 0 uyarı/0 hata, 2/2 geçici test
+- CI frontend eşdeğeri temiz `npm ci`, format check, lint, Vitest `1/1` ve production build — tamamı başarılı; 369 modül, yaklaşık 135.71 kB gzip JS
 - Commit öncesi `dotnet build .\FlowLogix.sln --no-restore` — başarılı; 5 proje, 0 uyarı, 0 hata
 - Commit öncesi `dotnet test .\FlowLogix.sln --no-build --no-restore` — başarılı; 2/2 geçici test
 
@@ -247,7 +259,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-FLOW-001.10b için PR ve `main` push tetikleyicili, en az yetkili GitHub Actions CI dosyasının amacı, her adımı ve güvenlik sınırları kullanıcıya öğretici biçimde anlatılacak; ardından kullanıcı workflow dosyasını oluşturacak.
+CI workflow, Dependabot config ve yaşayan belgeler amaçlarına göre commit edilecek; kullanıcı push için ayrıca açık onay verdikten sonra branch GitHub'a gönderilecek ve FLOW-001.10f kapsamında ilk Backend/Frontend uzak workflow sonuçları incelenecek.
 
 ## Yeni sohbet okuma sırası
 
