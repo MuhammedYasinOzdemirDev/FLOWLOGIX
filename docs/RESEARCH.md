@@ -630,6 +630,12 @@ FlowLogix için seçilen başlangıç politikası:
 - Üç action tek grupta birleştirilmeyecek. Her action'ın release notu, tam commit değişimi ve CI sonucu bağımsız incelenecek.
 - Dependabot PR'ları otomatik merge edilmeyecek; CI geçişi ve release notu incelemesi sonrasında kullanıcı kararıyla birleştirilecek.
 
+### 2026-07-05 uzak koşu sonucu
+
+Taslak PR #1 açıldıktan sonra ilk Backend işi, geçişli `Microsoft.OpenApi 2.0.0` paketindeki yüksek önem dereceli güvenlik açığını warning-as-error olarak yakalayıp restore aşamasında durdu. Uyarı bastırılmadı; aynı 2.x hattındaki düzeltilmiş `2.9.0` sürümü doğrudan ve merkezi olarak sabitlendi.
+
+Yerel Release restore/build/test ve geçişli vulnerability taraması temiz tamamlandı. Düzeltme push edildikten sonraki GitHub-hosted Ubuntu koşusunda Backend `27s`, Frontend `28s` içinde geçti; başarısız veya bekleyen iş kalmadı. Böylece CI workflow'un gerçek event, Linux dosya sistemi ve temiz runner davranışı doğrulandı.
+
 ### Kaynaklar
 
 - [GitHub — Building and testing .NET](https://docs.github.com/en/actions/tutorials/build-and-test-code/net)
@@ -1048,3 +1054,74 @@ MDN'ye göre `prefers-reduced-motion: reduce`, kullanıcının zorunlu olmayan h
 ### Kaynak
 
 - [MDN — prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-reduced-motion)
+
+## R-024 — Ücretsiz .NET 10 + React demo deployment hedefi
+
+**Tarih:** 2026-07-05
+
+**Durum:** Araştırma tamamlandı; sağlayıcı ve Azure aboneliği kullanıcı onayı bekliyor
+
+FlowLogix'in frontend'i ayrı bir public uygulama değildir. React, ASP.NET Core API ile same-origin cookie ve antiforgery davranışı kullanacaktır. Bu nedenle hosting seçimi yalnız “React nerede yayınlanır?” sorusu değil; .NET 10 runtime, aynı origin, gelecekteki SQL Server, secret, migration ve ücretsiz kota sorusudur.
+
+### Seçenek karşılaştırması
+
+| Seçenek | Güçlü taraf | FlowLogix maliyeti/risk | Sonuç |
+|---|---|---|---|
+| Azure App Service Free F1 + ileride Azure SQL Database Free | Windows code-only .NET 10 desteği, GitHub Actions, `azurewebsites.net` HTTPS, ASP.NET/SQL ekosistemi ve tek sağlayıcı | F1 günlük 60 CPU dakikası, 165 MB bant genişliği, 1 GB depolama, tek instance ve custom domain yok; Azure aboneliği gerekir | İlk demo için önerildi |
+| Azure Container Apps Consumption + Azure SQL Free | Aylık ücretsiz compute/request kotası, scale-to-zero, container taşınabilirliği | Dockerfile, image registry, revision, cold start ve Data Protection kalıcılığı foundation'a yeni operasyon katmanı getirir | Container öğrenme hedefi oluşana ertelendi |
+| Render Free web service | GitHub bağlantısı kolay, ücretsiz HTTPS ve custom domain, Docker ile .NET çalıştırabilir | 15 dakika boşta uyur ve uyanması yaklaşık bir dakika sürebilir; kalıcı disk yok; ücretsiz PostgreSQL 30 gün sonra sona erer ve SQL Server kararımızla uyumsuzdur | FlowLogix için seçilmedi |
+
+### Neden Azure App Service F1?
+
+- Microsoft'un güncel quickstart'ı App Service için .NET 10 LTS'yi doğrudan destekler.
+- React production çıktısı API'nin `wwwroot` alanına alınarak tek .NET publish paketi ve same-origin `/api` korunabilir. Ayrı frontend host, CORS veya browser token modeli gerekmez.
+- F1 planı demo/öğrenme için maliyetsizdir; `azurewebsites.net` alanında HTTPS sağlar.
+- Gelecekte gereken SQL Server davranışı, provider değiştirmeden Azure SQL Database'e taşınabilir.
+- GitHub Actions deployment'ı destekler. İlk FlowLogix akışı elle tetiklenecek ve uzun ömürlü publish profile yerine OIDC/federated identity kullanacaktır.
+
+### Ücretsiz sınırların dürüst yorumu
+
+App Service F1 gerçek lojistik işletmesi için production kapasitesi değildir. Günlük CPU ve düşük bant genişliği demo sırasında tükenebilir; custom domain ve deployment slot yoktur. Bu hedefin adı bu nedenle **ilk demo deployment provasıdır**.
+
+Azure SQL Database Free offer, abonelik ömrü boyunca veritabanı başına aylık 100.000 vCore-saniye, 32 GB veri ve 32 GB yedek kotası verir. Kota aşıldığında iki davranıştan biri seçilebilir:
+
+1. Veritabanını sonraki aya kadar otomatik durdur.
+2. Kullanıma devam et ve aşımı ücretlendir.
+
+FlowLogix birinci seçeneği kullanacaktır. Ancak ilk gerçek Identity migration'ı hazır olmadan boş veritabanı oluşturulmayacaktır.
+
+### Güvenlik ve işletim kapıları
+
+- Azure subscription/resource oluşturma, GitHub federated credential ve repository environment/secret işlemleri kullanıcı onayıyla yapılır.
+- GitHub Actions'ta Azure OIDC için yalnız deployment job'ına `id-token: write`, repository okuması için `contents: read` verilir.
+- Connection string ve development admin seed parolası App Service configuration içinde tutulur; tracked dosyaya yazılmaz.
+- App Service varsayılan olarak Production ortamını kullanır. Ayrıntılı exception sayfası açılmaz.
+- Azure Apps, Data Protection anahtarlarını `%HOME%\ASP.NET\DataProtection-Keys` altında kalıcı ağ depolamasında tutar; anahtarlar varsayılan olarak at-rest şifreli değildir. F1 tek instance/demo sınırında bu davranış ayrıca doğrulanacak, daha güçlü production hedefinde Blob/Key Vault koruması değerlendirilecektir.
+- App Service TLS'i öndeki yük dengeleyicide sonlandırır. Cookie `Secure` ve HTTPS yönlendirme davranışı için forwarded-header güven sınırı deployment smoke testinde kontrol edilir.
+- Production migration uygulama startup'ında otomatik yapılmaz. SQL script incelenir ve açık deployment adımıyla uygulanır.
+- İlk deployment elle tetiklenir. Public URL, React SPA fallback, `/api` hata sözleşmesi, HTTPS, log ve yeniden başlatma kontrolü geçmeden otomatik `main` deployment'ı açılmaz.
+- Azure portalında maliyet görünümü ve kota metrikleri kontrol edilir; oluşturulan kaynakların isimleri ve silme sırası yaşayan belgede tutulur.
+
+### Planlanan sıra
+
+1. FLOW-001.11 SonarQube Cloud kurulumu tamamlanır.
+2. Kullanıcı D-030 Azure hedefini ve abonelik sınırını onaylar.
+3. React build çıktısının ASP.NET Core publish paketine girmesi ve SPA fallback davranışı kullanıcı tarafından uygulanır.
+4. Yerel Release publish ve same-origin smoke testi yapılır.
+5. Free F1 App Service oluşturulur; production ayarları ve GitHub OIDC bağlantısı kurulur.
+6. Elle tetiklenen ilk deployment yapılır ve public URL doğrulanır.
+7. İlk Identity migration'ında Azure SQL Free oluşturulur; firewall/connection string/migration adımları ayrı doğrulanır.
+
+### Kaynaklar
+
+- [Microsoft — Azure App Service limits](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits#azure-app-service-limits)
+- [Microsoft — App Service .NET 10 quickstart](https://learn.microsoft.com/en-us/azure/app-service/quickstart-dotnetcore)
+- [Microsoft — Deploy to App Service with GitHub Actions](https://learn.microsoft.com/en-us/azure/app-service/deploy-github-actions)
+- [Microsoft — App Service pricing and `azurewebsites.net` HTTPS](https://azure.microsoft.com/en-us/pricing/details/app-service/windows/)
+- [Microsoft — Azure SQL Database Free offer](https://learn.microsoft.com/en-us/azure/azure-sql/database/free-offer)
+- [Microsoft — Azure Container Apps pricing](https://azure.microsoft.com/en-us/pricing/details/container-apps/)
+- [Microsoft — Container Apps GitHub Actions deployment](https://learn.microsoft.com/en-us/azure/container-apps/github-actions)
+- [Microsoft — App Service ASP.NET Core configuration](https://learn.microsoft.com/en-us/azure/app-service/configure-language-dotnetcore)
+- [Microsoft — ASP.NET Core Data Protection default settings](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/default-settings?view=aspnetcore-10.0)
+- [Render — Free service limitations](https://render.com/docs/free)
+- [Render — Web services and Docker runtime](https://render.com/docs/web-services)

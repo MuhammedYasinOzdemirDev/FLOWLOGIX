@@ -37,7 +37,7 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
     - [x] FLOW-001.7g.4 — API composition root'tan iki modülü kaydet ve endpoint'lerini eşle
     - [x] FLOW-001.7g.5 — Public yüzey, dependency graph, build ve runtime davranışını doğrula
   - [x] FLOW-001.7h — Development OpenAPI ve ortak Problem Details pipeline temelini kur ve HTTP üzerinden doğrula
-- [ ] FLOW-001.8 — React/Vite proje iskeletini kullanıcı oluştursun
+- [x] FLOW-001.8 — React/Vite proje iskeletini kullanıcı oluştursun
   - [x] FLOW-001.8a — Güncel React/Vite/TypeScript/Router/Query/test sürüm, lisans ve Node uyumluluğunu doğrula
   - [x] FLOW-001.8b — Vite React/TypeScript iskeletini `src/FlowLogix.Web` altında oluştur
   - [x] FLOW-001.8c — Router ve Query bağımlılıklarını exact sürümlerle ekle
@@ -82,13 +82,13 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
     - [x] FLOW-001.8e.1e — Geçici demo testini uygulama kabuğu davranış testiyle değiştir
   - [x] FLOW-001.8f — Clean install, lint, test ve production build kapılarını doğrula
 - [x] FLOW-001.9 — Restore/build sonuçlarını agent doğrulasın
-- [ ] FLOW-001.10 — Frontend yerel kapısı da yeşil olduktan sonra GitHub Actions CI akışını ekle
+- [x] FLOW-001.10 — Frontend yerel kapısı da yeşil olduktan sonra GitHub Actions CI akışını ekle
   - [x] FLOW-001.10a — CI alternatiflerini, güncel official action hattını ve güvenlik kurallarını araştır
   - [x] FLOW-001.10b — PR ve `main` push tetikleyicili, read-only permission'lı CI workflow taslağını kullanıcı oluştursun
   - [x] FLOW-001.10c — Backend restore/build/test adımlarını `global.json` ile aynı SDK üzerinde çalıştır
   - [x] FLOW-001.10d — Frontend `npm ci`, lint, test ve build adımlarını lockfile üzerinden çalıştır
   - [x] FLOW-001.10e — Actions'ı full commit SHA ile pinle ve Dependabot Actions güncellemesini değerlendir
-  - [ ] FLOW-001.10f — İlk remote workflow sonucunu incelemeden required check/branch protection açma
+  - [x] FLOW-001.10f — İlk remote workflow sonucunu incelemeden required check/branch protection açma
 - [ ] FLOW-001.11 — SonarQube Cloud statik analizini aşamalı kur
   - [x] FLOW-001.11a — SonarQube Cloud, self-hosted Server ve GitHub-native alternatifleri karşılaştır
   - [ ] FLOW-001.11b — Kullanıcı public repository'yi SonarQube Cloud'a bağlasın ve `SONAR_TOKEN` repository secret'ını oluştursun
@@ -96,6 +96,14 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
   - [ ] FLOW-001.11d — İlk aşamada C# analizini CI-based scanner ile çalıştır; token olmayan fork akışını güvenli ele al
   - [ ] FLOW-001.11e — Sonar TypeScript 6 desteği doğrulanınca frontend multi-language analizini aç
   - [ ] FLOW-001.11f — Gerçek testler oluşunca coverage üretimini/import'unu ve quality-gate bloklamasını etkinleştir
+- [ ] FLOW-001.12 — SonarQube kurulumundan sonra ücretsiz demo deployment temelini kur
+  - [x] FLOW-001.12a — .NET 10, React same-origin ve gelecekteki SQL Server ihtiyacı için ücretsiz hosting seçeneklerini araştır
+  - [ ] FLOW-001.12b — Kullanıcı önerilen Azure hedefini ve abonelik/ücretsiz kota güvenlik sınırlarını onaylasın
+  - [ ] FLOW-001.12c — React production çıktısını ASP.NET Core üzerinden same-origin sunan publish sözleşmesini kullanıcı uygulasın
+  - [ ] FLOW-001.12d — Azure App Service Free F1 üzerinde .NET 10 uygulamasını ve production ayarlarını oluştur
+  - [ ] FLOW-001.12e — GitHub Actions ile uzun ömürlü deployment parolası yerine OIDC tabanlı, önce elle tetiklenen deployment akışını kur
+  - [ ] FLOW-001.12f — Public URL, HTTPS, API/SPA fallback, yeniden başlatma, log ve ücretsiz kota smoke kontrollerini doğrula
+  - [ ] FLOW-001.12g — Azure SQL Database Free kaynağını ilk gerçek Identity migration'ına kadar oluşturma; bağlantı, firewall ve migration planını hazır tut
 
 ### Kabul kriterleri
 
@@ -107,6 +115,7 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
 - Frontend clean install ve build verir.
 - GitHub Actions aynı backend ve frontend doğrulama komutlarını çalıştırır.
 - Sonar secret'ı tracked dosyada bulunmaz; analiz kapsamı kullanılan dil sürümleriyle uyumludur.
+- İlk demo deployment aynı origin üzerinde .NET API ve React çıktısını sunar; secret tracked dosyada bulunmaz ve ücretsiz kota aşımında otomatik ücret oluşmayacak sınır seçilir.
 - Secret veya gerçek connection string tracked dosyada bulunmaz.
 - Belgeler gerçek repository durumuyla tutarlıdır.
 

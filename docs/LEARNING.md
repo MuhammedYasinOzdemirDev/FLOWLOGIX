@@ -37,11 +37,12 @@
 
 ## Sıradaki öğrenme hedefi
 
-FLOW-001 ilk uzak CI doğrulamasında:
+FLOW-001 SonarQube ve ilk deployment temelinde:
 
-- Yerel başarı ile GitHub-hosted Ubuntu runner başarısının farkı
-- Workflow run, job ve check sonuçlarının GitHub üzerinde okunması
-- İlk başarılı koşudan sonra required check adlarının belirlenmesi
+- Statik analiz, build/test ve deployment kapılarının farklı sorumlulukları
+- GitHub OIDC ile uzun ömürlü deployment secret'ı arasındaki güvenlik farkı
+- Same-origin React çıktısının ASP.NET Core publish paketine nasıl girdiği
+- Ücretsiz compute kotası, SQL kotası, production config ve migration yaşam döngüsü
 
 ## L-006 — İyi mimari en fazla pattern değil, doğru değişim maliyetidir
 
@@ -317,5 +318,16 @@ FLOW-001 ilk uzak CI doğrulamasında:
 - **Gerçek davranış:** `Microsoft.AspNetCore.OpenApi 10.0.9`, `Microsoft.OpenApi >= 2.0.0` ister. NuGet uygun en düşük sürüm olan `2.0.0`ı seçti; repository warning-as-error kullandığı için yüksek önem dereceli `NU1903` uyarısı restore işlemini başarısız yaptı.
 - **Güvenlik kararı:** Uyarıyı bastırmak sorunu çözmez. Aynı 2.x ana sürüm hattındaki düzeltilmiş ve güncel kararlı `Microsoft.OpenApi 2.9.0` doğrudan sabitlenerek hem güvenlik açığı kapatılabilir hem de gereksiz 3.x kırılma riski alınmaz.
 - **Yerel doğrulama:** API paket ağacı hem istenen hem çözümlenen sürümü `2.9.0` olarak gösterdi. Release solution build'i `0` uyarı/`0` hatayla ve iki geçici test başarıyla tamamlandı; solution genelindeki geçişli güvenlik taraması bilinen açık bulmadı.
-- **Kanıt sınırı:** İlk uzak koşuda Frontend ve Dependabot kontrolleri geçti; Backend derleme ve test adımlarına restore başarısız olduğu için ulaşılamadı. FLOW-001.10f ancak düzeltme PR'a gönderilip ikinci uzak koşu tamamen yeşil olduğunda kapanabilir.
+- **Uzak doğrulama:** Düzeltme PR'a gönderildikten sonra temiz GitHub Ubuntu runner'ında Backend `27s`, Frontend `28s` içinde geçti. Başarısız veya bekleyen kontrol kalmadığı için FLOW-001.10f kapandı.
+- **Kanıt sınırı:** Bu sonuç CI mekanizmasını ve mevcut iki keşif testini doğrular; henüz yazılmamış müşteri domain kuralları, SQL persistence veya Identity davranışı için ürün kanıtı değildir.
 - **Yaygın hata:** Geçişli bağımlılıkları görünmez sanmak, güvenlik uyarısını `NoWarn` ile susturmak veya güvenli en küçük ana sürüm değişikliği yerine düşünmeden yeni major sürüme geçmek.
+
+## L-037 — Ücretsiz deployment yalnız uygulama sunucusunun fiyatı değildir
+
+- **Bağlam:** FLOW-001.12 deployment hedefi araştırması
+- **Başlangıç seviyesi:** Uygulamanın internette açılması yalnız bir web adresi almak değildir; çalışan .NET süreci, kalıcı veritabanı, secret'lar, HTTPS, migration, log, yedek ve kota birlikte düşünülür.
+- **Mimari etkisi:** FlowLogix React çıktısını ASP.NET Core üzerinden sunarak tek deployment ve same-origin cookie modelini korur. Frontend'i ayrı statik hosta ayırmak ilk sürümde CORS, cookie ve antiforgery sınırını gereksiz büyütür.
+- **Maliyet etkisi:** App Service F1 ücretsizdir fakat günlük CPU, bant genişliği, depolama ve custom-domain sınırları vardır. Azure SQL'in ücretsiz kotası ayrıdır; kota bitince otomatik ücret yerine durma seçeneği özellikle seçilmelidir.
+- **Güvenlik etkisi:** Deployment kimliği için uzun ömürlü publish profile yerine kısa ömürlü GitHub OIDC kimliği; uygulama secret'ları için repository yerine App Service ayarları tercih edilir.
+- **Zamanlama:** Bulut SQL kaynağı boş foundation için kurulmaz; ilk gerçek migration hazır olduğunda açılır. Bu erteleme mimari kaçış değil, henüz kullanılmayan kalıcı ve güvenlik duyarlı kaynağı oluşturmama disiplinidir.
+- **Yaygın hata:** Yalnız web host ücretsiz diye bütün sistemin ücretsiz ve production-ready olduğunu sanmak, otomatik ücret seçeneğini açık bırakmak veya migration'ı uygulama başlangıcında kontrolsüz çalıştırmak.

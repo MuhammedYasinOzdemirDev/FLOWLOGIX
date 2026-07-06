@@ -18,10 +18,32 @@
 - .NET SDK ve yerel SQL Server doğrulaması
 - Solution/proje iskeleti
 - Backend ve frontend için ilk build
+- GitHub Actions ve aşamalı SonarQube Cloud kalite zemini
+- SonarQube sonrasında ücretsiz ortamda ilk demo deployment provası
 
 ### Çıkış ölçütü
 
-Repository'de belgeler ve kullanıcı tarafından oluşturulmuş çalışan solution bulunur; backend ve frontend clean build verir.
+Repository'de belgeler ve kullanıcı tarafından oluşturulmuş çalışan solution bulunur; backend ve frontend clean build verir, uzak CI yeşildir ve ücretsiz demo URL'si üzerinde same-origin uygulama kabuğu doğrulanır.
+
+## SonarQube sonrası — İlk demo deployment provası
+
+Bu adım yeni ürün modülü değildir; Faz 0'ın “yerelde çalışan kodu güvenli ve tekrarlanabilir biçimde yayınlama” kapanışıdır.
+
+### Planlanan çıktı
+
+- Azure App Service Free F1 üzerinde .NET 10 host
+- ASP.NET Core tarafından sunulan React production çıktısı ve same-origin `/api`
+- GitHub Actions üzerinden önce elle tetiklenen, OIDC tabanlı deployment
+- HTTPS, SPA fallback, API, log ve yeniden başlatma smoke kontrolleri
+- Ücretsiz kota aşımında otomatik ücret doğurmayacak ayarlar ve silme/geri dönüş notu
+
+### Veritabanı kapısı
+
+Bulut Azure SQL kaynağı yalnız ilk gerçek Identity migration'ı hazır olduğunda oluşturulur. Azure SQL Database Free offer seçilirse migration SQL'i incelenir, connection string App Service ayarında tutulur ve kota aşım davranışı “ay sonuna kadar otomatik durdur” olur.
+
+### Karar kapısı
+
+Kullanıcı Azure hedefini ve abonelik sınırlarını onaylamadan bulut kaynağı, secret veya federated credential oluşturulmaz. İlk deployment smoke kontrolü geçmeden otomatik `main` deployment'ı açılmaz.
 
 ## 1. Hafta — Foundation ve Identity başlangıcı
 

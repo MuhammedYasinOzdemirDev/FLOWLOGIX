@@ -173,8 +173,8 @@
 ## D-018 — CI ve aşamalı statik analiz
 
 - **Tarih:** 2026-06-29
-- **Durum:** GitHub Actions kabul edildi; SonarQube Cloud aktivasyonu kullanıcı onayı/account işlemi bekliyor
-- **CI kararı:** Frontend scaffold ve lockfile sonrası, local backend/frontend komutlarını `pull_request` ve `main` push üzerinde çalıştıran GitHub Actions workflow'u eklenecek.
+- **Durum:** GitHub Actions tamamlandı ve uzak koşuda doğrulandı; SonarQube Cloud aktivasyonu kullanıcı onayı/account işlemi bekliyor
+- **CI kararı:** Frontend scaffold ve lockfile sonrasında, yerel backend/frontend komutlarını `pull_request` ve `main` push üzerinde çalıştıran GitHub Actions workflow'u eklendi ve GitHub-hosted Ubuntu runner'da doğrulandı.
 - **Güvenlik:** Workflow varsayılan read-only permission kullanacak, `pull_request_target` kullanmayacak, third-party action'lar doğrulanmış full commit SHA ile pinlenecek ve secret tracked dosyaya yazılmayacak.
 - **Action güncellemeleri:** Tam commit kimlikleri haftalık Dependabot `github-actions` kontrolüyle izlenecek; en fazla üç ayrı güncelleme PR'ı açılacak. Güncellemeler gruplanmayacak veya otomatik merge edilmeyecek.
 - **Sonar önerisi:** Public FlowLogix repository için self-hosted SonarQube Server yerine SonarQube Cloud Free kullanılacak; server/DB/backup/upgrade işletim yükü alınmayacak.
@@ -309,3 +309,16 @@
 - **Erişilebilirlik:** İşletim sistemi veya tarayıcıda azaltılmış hareket isteyen kullanıcılar için `prefers-reduced-motion: reduce` altında giriş ve geçiş hareketleri kapatılacak.
 - **Yeniden değerlendirme:** Sayfalar arası çıkış/giriş koordinasyonu, sürükleme, karmaşık yerleşim geçişi veya CSS ile güvenilir biçimde yönetilemeyen gerçek ürün etkileşimi oluşursa Motion ayrıca değerlendirilecek.
 - **Araştırma:** `docs/RESEARCH.md` içindeki R-023.
+
+## D-030 — Ücretsiz ilk demo deployment hedefi
+
+- **Tarih:** 2026-07-05
+- **Durum:** Önerildi; bulut sağlayıcısı ve abonelik işlemi için kullanıcı onayı bekliyor
+- **Öneri:** SonarQube Cloud kurulumundan sonra ilk demo deployment, Azure App Service Free F1 üzerinde Windows code-only .NET 10 uygulaması olarak yapılacak. React production çıktısı ASP.NET Core tarafından sunulacak; API ve frontend aynı origin'i koruyacak.
+- **Veritabanı yönü:** İlk gerçek Identity migration'ına kadar bulut veritabanı oluşturulmayacak. Gerektiğinde aynı sağlayıcıdaki Azure SQL Database Free offer kullanılacak ve kota aşımında ücretlendirme yerine ay sonuna kadar otomatik durma seçilecek.
+- **Deployment güvenliği:** İlk akış elle tetiklenecek. GitHub–Azure bağlantısında uzun ömürlü publish profile yerine OIDC/federated identity tercih edilecek. Connection string, seed parolası ve diğer production ayarları repository'de tutulmayacak.
+- **Migration:** Production migration uygulama başlangıcında otomatik çalışmayacak; üretilen SQL incelendikten sonra açık deployment adımıyla uygulanacak.
+- **Alternatifler:** Azure Container Apps Consumption teknik olarak ücretsiz kota ve scale-to-zero sağlar fakat Docker, image registry, revision ve Data Protection tasarımını erkenden getirir. Render Free kolaydır fakat servis uykuya geçer, .NET için Docker gerekir ve ücretsiz PostgreSQL 30 gün sonra sona erer; mevcut SQL Server kararını bozar veya iki sağlayıcıyı birleştirir.
+- **Sınır:** App Service F1 yalnız demo/öğrenme hedefidir; günlük 60 CPU dakikası, 165 MB bant genişliği, 1 GB depolama, tek instance ve custom-domain yokluğu gerçek işletme üretimi için yeterli kabul edilmez.
+- **Yeniden değerlendirme:** Gerçek kullanıcı, özel alan adı, SLA, daha yüksek trafik, deployment slot veya kesintisiz çalışma gerektiğinde ücretli App Service planı ya da ölçülmüş ihtiyaçla Container Apps değerlendirilir.
+- **Araştırma:** `docs/RESEARCH.md` içindeki R-024.

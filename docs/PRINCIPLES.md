@@ -21,6 +21,8 @@ Karar ve doğrulama sırası:
 - Bu yetki React uygulama/ürün kodunu, backend/domain kodunu, migration'ı veya ürün davranışını kapsamaz; bu alanlarda task-bazlı açık izin gerekir.
 - Agent yaşayan Markdown belgelerini oluşturup güncelleyebilir.
 - Kullanıcının değişiklikleri geri alınmaz.
+- Onay kapsamı eylemden önce somut biçimde sayılır. Kullanıcının kısa onayı yalnız bu sayılan eylemler için geçerlidir; başarısız girişin farklı yetkiyle tekrarı, yeni dış hizmet, kaynak kodu, commit veya push için kendiliğinden genişletilmez.
+- Harici hesap bağlantısı, repository secret'ı, bulut kaynağı ve ücret riski taşıyan ayar kullanıcı adına oluşturulmadan önce veri akışı, ücretsiz kota, olası ücret ve geri alma/silme yolu açıklanır.
 
 ## 3. Öğretici çalışma biçimi
 
@@ -75,6 +77,7 @@ Her kaynak kod adımı şu sırayı izler:
 - Build/test sonucu görülmeden task tamamlanmış sayılmaz.
 - Migration üretilince SQL ve veri kaybı riski incelenmeden uygulanmaz.
 - Task sonunda kabul kriteri, negatif senaryolar, dokümanlar ve öğrenme kaydı birlikte kapatılır.
+- “Ücretsiz plan” kabulü yalnız fiyat etiketine dayanmaz; kota aşımında otomatik ücret yerine durma/askıya alma seçeneği, veri kalıcılığı, yedekleme, soğuk başlangıç ve kaynak silme adımı doğrulanır.
 
 ## 7. Git
 

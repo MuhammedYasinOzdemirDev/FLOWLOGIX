@@ -4,10 +4,10 @@
 
 - **Milestone:** Faz 0 — Bağlam ve çalışma zemini
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
-- **Aktif alt task:** FLOW-001.10f — İlk uzak workflow koşusunu doğrula
+- **Aktif alt task:** FLOW-001.11b — Repository'yi SonarQube Cloud'a bağla ve secret'ı oluştur
 - **Branch:** `feature/FLOW-001-foundation`
-- **Son doğrulanan kaynak commit:** `8bb0f8a` — `feat(web): establish operations control shell`
-- **Son repository commit:** `71c7f0c` — `docs: record verified CI foundation`
+- **Son doğrulanan kaynak commit:** `1a0e741` — `fix(api): pin patched OpenAPI dependency`
+- **Son repository commit:** `80cf0d5` — `docs: record first remote CI remediation`
 
 ## Mevcut repository yapısı
 
@@ -88,7 +88,7 @@
 - `origin` remote'u `MuhammedYasinOzdemirDev/FLOWLOGIX` olarak doğrulandı; GitHub CLI makinede kurulu olmadığı için CLI authentication kontrolü yapılamadı.
 - Conventional Commits ile `01a0d29 docs: establish FlowLogix project guidance`, `8c2345b build: configure repository tooling`, `7c650ce feat(api): establish modular backend foundation` ve `7ab78a2 docs: record CI and analysis strategy` commitleri oluşturuldu.
 - Son source commit öncesi whitespace kontrolü, solution build ve test tekrar geçti; 5 proje `0` uyarı/`0` hata ve `2/2` geçici test başarılı.
-- GitHub API repository'nin public, default branch'in `main` olduğunu doğruladı; push yapılmadı.
+- GitHub API repository'nin public, default branch'in `main` olduğunu doğruladı; bu ilk kontrol anında push yapılmamıştı.
 - GitHub Actions, SonarQube Cloud/Server, CodeQL, action pinning, secret, coverage ve TypeScript uyumluluğu R-012'de araştırıldı.
 - Frontend local kapısı yeşil olduktan sonra read-only GitHub Actions CI kurulmasına; kullanıcı dış hizmet aktivasyonunu onaylarsa public repo için SonarQube Cloud Free kullanılmasına karar verildi.
 - TypeScript `6.0.3` kararlı olmasına rağmen Sonar'ın resmi tam desteği `5.9.3`te kaldığı için ilk Sonar taramasının C# ile sınırlandırılması ve frontend analizinin destek kapısında açılması kaydedildi.
@@ -151,7 +151,7 @@
 - Workflow YAML'ı ilk kayıtta 67 CRLF ve 1 LF satır sonuyla Prettier kapısını geçemedi. Kullanıcı dosyayı Prettier ile biçimlendirdi; son durumda 68/68 satır LF, YAML biçimi ve whitespace kontrolü başarılı.
 - Üç resmî action doğrulanmış tam commit kimliğiyle sabitlendi: checkout `v6.0.3`, setup-dotnet `v5.4.0`, setup-node `v6.4.0`. Node npm otomatik cache davranışı `package-manager-cache: false` ile bilinçli olarak kapalı.
 - Backend workflow komutları yerelde birebir çalıştırıldı: restore başarılı; Release solution build 5 projede `0` uyarı/`0` hata; Release testler `2/2` başarılı. Frontend workflow komutları temiz `npm ci` sonrasında format check, lint, Vitest `1/1` ve production build olarak tamamı başarılı.
-- FLOW-001.10b–d yerel kanıtla tamamlandı. GitHub-hosted Ubuntu runner sonucu henüz görülmedi; action güncelleme/Dependabot politikası ve ilk remote koşu beklediği için FLOW-001.10 üst işi açık.
+- FLOW-001.10b–d önce yerel kanıtla, ardından GitHub-hosted Ubuntu runner üzerinde doğrulandı.
 - Dependabot `github-actions` desteği resmî GitHub belgelerinden doğrulandı. Yalnız action referanslarını pazartesi 06:00 Europe/Istanbul saatinde haftalık kontrol eden, en fazla üç ayrı PR açan ve otomatik merge yapmayan başlangıç politikası seçildi; npm/NuGet kapsamı bu adıma eklenmedi.
 - Kullanıcı `.github/dependabot.yml` dosyasını oluşturdu. İlk kayıttaki CRLF satır sonları Prettier ile LF'ye çevrildi; son durumda iki GitHub YAML dosyası Prettier, whitespace ve LF kontrollerinden geçti.
 - Dependabot config'i yalnız `github-actions`, kök dizin taraması, haftalık pazartesi 06:00 Europe/Istanbul ve en fazla üç açık PR sınırı içeriyor. Action SHA sabitlemesi ve bakım politikası birlikte doğrulandı; FLOW-001.10e tamamlandı.
@@ -161,8 +161,14 @@
 - İlk `pull_request` koşusunda Frontend işi ve Dependabot yapılandırma kontrolü geçti; Backend işi restore adımında durdu. GitHub Actions logu, `Microsoft.AspNetCore.OpenApi 10.0.9` bağımlılık zincirinin en düşük uygun sürüm olarak seçtiği `Microsoft.OpenApi 2.0.0` için `NU1903` yüksek önem dereceli `GHSA-v5pm-xwqc-g5wc` uyarısını ve warning-as-error nedeniyle exit code `1` sonucunu gösterdi.
 - GitHub Advisory Database'e göre etkilenen 2.x aralığı `2.0.0-preview11`–`2.7.4`, düzeltilmiş ilk 2.x sürümü `2.7.5`tir. Kullanıcı onayıyla mevcut 2.x API hattını koruyan güncel kararlı `Microsoft.OpenApi 2.9.0`, merkezi paket yönetimine ve API projesine doğrudan referans olarak eklendi.
 - Paket düzeltmesi sonrasında Release restore/build/test yerelde geçti: beş proje `0` uyarı/`0` hata ile derlendi ve iki geçici keşif testi geçti. Paket ağacı `Microsoft.OpenApi 2.9.0` sürümünün istendiğini ve çözümlendiğini gösterdi; tüm solution için geçişli paketler dâhil güvenlik açığı taraması bilinen açık bulmadı.
-- GitHub CLI `2.96.0`, resmî `GitHub.cli` winget paketiyle kuruldu. CLI henüz bir GitHub hesabına bağlanmadı; `gh auth login` kullanıcı onayı bekliyor.
-- Bu oturumda `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; yaşayan frontend belgeleri bu handoff commit'iyle kaydedildi. Push veya merge yapılmadı.
+- GitHub CLI `2.96.0`, resmî `GitHub.cli` winget paketiyle kuruldu ve kullanıcı onayıyla `MuhammedYasinOzdemirDev` hesabına bağlandı. Git protokolü HTTPS; token Windows keyring içinde tutuluyor ve `repo`, `workflow`, `read:org`, `gist` kapsamlarını taşıyor.
+- Paket düzeltmesi `1a0e741 fix(api): pin patched OpenAPI dependency`, ilgili kanıt ve öğrenme kaydı `80cf0d5 docs: record first remote CI remediation` commit'lerinde tutuldu; ikisi de taslak PR #1 branch'ine push edildi.
+- Push sonrasındaki ikinci `pull_request` koşusu GitHub CLI ile izlendi. Backend `27s`, Frontend `28s` içinde geçti; başarısız, iptal edilmiş veya bekleyen CI işi kalmadı. FLOW-001.10f ve FLOW-001.10 tamamlandı.
+- Kullanıcı geri bildirimi üzerine `AGENTS.md` okuma sırası ve yaşayan belgeler sohbet özetine güvenilmeden yeniden okundu. Onayın yalnız açıkça sayılan eylemlere ait olduğu ve dış hizmet/ücret riskinin ayrıca açıklanıp onaylanacağı kuralı güçlendirildi.
+- SonarQube sonrasındaki ücretsiz deployment için Azure App Service F1, Azure Container Apps Consumption ve Render Free güncel resmî sınırlarıyla karşılaştırıldı. D-030/R-024 ile Azure App Service F1 önerildi; sağlayıcı ve abonelik kararı kullanıcı onayı bekliyor.
+- Deployment iki aşamaya ayrıldı: SonarQube sonrasında mevcut .NET + React kabuğu same-origin App Service'e gönderilecek; Azure SQL Free kaynağı ilk gerçek Identity migration'ına kadar oluşturulmayacak.
+- Bu belge denetimi `AGENTS.md` ile yedi yaşayan `docs/` dosyasında yalnız dokümantasyon değişikliği üretti. Kaynak kodu değiştirilmedi; yeni dokümantasyon henüz commit veya push edilmedi.
+- `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; daha sonra feature branch'e push edildi. Merge yapılmadı.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
 
@@ -238,16 +244,18 @@
 
 ## Açık durum ve riskler
 
-- Frontend source/tooling, çalışma kuralları ve yaşayan proje hafızası dört mantıksal commit grubunda kaydedildi. GitHub'a push edilmedi.
+- Frontend source/tooling, çalışma kuralları ve yaşayan proje hafızası niyet bazlı commit gruplarıyla kaydedildi ve `feature/FLOW-001-foundation` branch'ine push edildi; taslak PR #1 açıktır.
 - `FlowLogix.Customers.csproj` için çalışma ağacı ve index içerik hash'lerinin aynı olduğu doğrulandı; CRLF/LF stat bilgisi içerik commit'i oluşturmadan yenilendi ve çalışma ağacı temizlendi.
 - `.vs/` ignore kuralı kullanıcı tarafından eklendi ve doğrulandı.
 - İki `Test1.cs` yalnız MTP keşif altyapısını doğrulayan geçici şablon testidir; gerçek domain/integration kapsamı gibi sayılmamalı ve ilk gerçek testlerle değiştirilmelidir.
 - React/Vite scaffold doğru konumda; Router/Query exact sürümle kurulu ve son test/lint/build kapıları yeşil. `test` script'i ve uygulama kabuğunu sınayan 1 gerçek component testi mevcut.
 - SQL Server bağlantı biçimi ve development database adı source adımında doğrulanmalı; secret repository'ye yazılmamalı.
 - Paket exact sürümleri kurulum anında resmi kaynak/NuGet/npm üzerinden tekrar doğrulanmalı.
-- GitHub CLI makinede kurulu değil; remote API erişimi mevcut, ancak CLI ile auth/secret/push işlemi yapılamıyor.
+- GitHub CLI `2.96.0` kurulu ve `MuhammedYasinOzdemirDev` hesabına Windows keyring üzerinden bağlıdır. Dış hizmet ve secret işlemleri yine task-bazlı kullanıcı onayı gerektirir.
 - SonarQube Cloud project import ve `SONAR_TOKEN` oluşturma dış hizmet işlemi olduğundan kullanıcı tarafından yapılmalı.
 - SonarQube Cloud resmi TypeScript tam desteği `5.9.3`; FlowLogix TypeScript 6 frontend analizi açılmadan yeniden doğrulanmalı.
+- Azure deployment hedefi henüz kullanıcı tarafından onaylanmadı. App Service F1 demo sınırları gerçek işletme production kapasitesi sayılmayacak; bulut kaynağı ve federated credential onaysız oluşturulmayacak.
+- Agent kural tazelemesi, uzak CI kapanışı ve deployment planını taşıyan sekiz dokümantasyon dosyası çalışma ağacında commit edilmemiş durumdadır.
 - API development HTTPS sertifikası trusted; Vite proxy Node process'inin system CA kullanması project `.npmrc` ile uygulandı ve gerçek proxy isteğinde doğrulandı.
 - Prettier format kapısı ve ilk baseline doğrulandı; format check yeşil. Vite demo ekranı, testi ve kullanılmayan görselleri kaldırıldı.
 - Word belgesinin görsel render kontrolü ortamda LibreOffice bulunmadığı için yapılamadı; içerik OOXML ve metin/tablo çıkarımıyla okundu.
@@ -265,7 +273,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-Kullanıcı paket güvenliği düzeltmesini ve yaşayan belge güncellemelerini inceleyip commit/push için açık onay verecek; ardından PR #1'in ikinci uzak Backend/Frontend koşusu izlenecek.
+Yarın önce çalışma ağacındaki sekiz dokümantasyon dosyasının kapsamı yeniden doğrulanacak ve commit/push için kullanıcıdan açık onay istenecek. Bu kayıt güvenceye alındıktan sonra FLOW-001.11b SonarQube Cloud bağlantısına geçilecek.
 
 ## Yeni sohbet okuma sırası
 
