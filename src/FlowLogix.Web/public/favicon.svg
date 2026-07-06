@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="flowlogix-gradient" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA" />
+      <stop offset=".52" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#0F766E" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#0B1739" />
+  <path
+    d="M17 20h19a9 9 0 0 1 9 9v1M47 44H28a9 9 0 0 1-9-9v-1"
+    fill="none"
+    stroke="url(#flowlogix-gradient)"
+    stroke-linecap="round"
+    stroke-width="7"
+  />
+  <path d="m40 23 7 7-7 7M24 27l-7 7 7 7" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" />
+</svg>
