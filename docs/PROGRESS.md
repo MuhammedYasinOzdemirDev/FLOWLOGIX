@@ -4,10 +4,10 @@
 
 - **Milestone:** Faz 0 — Bağlam ve çalışma zemini
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
-- **Aktif alt task:** FLOW-001.11b — Repository'yi SonarQube Cloud'a bağla ve secret'ı oluştur
-- **Branch:** `feature/FLOW-001-foundation`
-- **Son doğrulanan kaynak commit:** `1a0e741` — `fix(api): pin patched OpenAPI dependency`
-- **Son repository commit:** `80cf0d5` — `docs: record first remote CI remediation`
+- **Aktif alt task:** FLOW-001.11d — SonarQube workflow'u kullanıcı tarafından oluşturuldu ve yerel kapılar geçti; ilk remote Sonar analizi için commit/push açık onayı bekleniyor
+- **Branch:** `main`; `origin/main` ile aynı commit'te
+- **Son doğrulanan commit:** `26732e6` — `Merge pull request #1 from MuhammedYasinOzdemirDev/feature/FLOW-001-foundation`
+- **Dokümantasyon durumu:** Sekiz belgeli son grup `4a3897f` (`docs: refresh collaboration and deployment roadmap`) commit'inde; PR #1 ile `main` dalına merge edildi. Bu PROGRESS düzeltmesi öncesinde çalışma ağacı temizdi.
 
 ## Mevcut repository yapısı
 
@@ -167,8 +167,28 @@
 - Kullanıcı geri bildirimi üzerine `AGENTS.md` okuma sırası ve yaşayan belgeler sohbet özetine güvenilmeden yeniden okundu. Onayın yalnız açıkça sayılan eylemlere ait olduğu ve dış hizmet/ücret riskinin ayrıca açıklanıp onaylanacağı kuralı güçlendirildi.
 - SonarQube sonrasındaki ücretsiz deployment için Azure App Service F1, Azure Container Apps Consumption ve Render Free güncel resmî sınırlarıyla karşılaştırıldı. D-030/R-024 ile Azure App Service F1 önerildi; sağlayıcı ve abonelik kararı kullanıcı onayı bekliyor.
 - Deployment iki aşamaya ayrıldı: SonarQube sonrasında mevcut .NET + React kabuğu same-origin App Service'e gönderilecek; Azure SQL Free kaynağı ilk gerçek Identity migration'ına kadar oluşturulmayacak.
-- Bu belge denetimi `AGENTS.md` ile yedi yaşayan `docs/` dosyasında yalnız dokümantasyon değişikliği üretti. Kaynak kodu değiştirilmedi; yeni dokümantasyon henüz commit veya push edilmedi.
-- `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; daha sonra feature branch'e push edildi. Merge yapılmadı.
+- Bu belge denetimi `AGENTS.md` ile yedi yaşayan `docs/` dosyasında yalnız dokümantasyon değişikliği üretti. Kaynak kodu değiştirilmedi; değişiklikler `4a3897f docs: refresh collaboration and deployment roadmap` commit'inde kaydedildi.
+- `f0b190b build(web): establish deterministic React toolchain`, `29c6f4c feat(web): define application provider foundation` ve `be84d7d docs: strengthen frontend collaboration rules` commitleri niyet bazlı gruplarla oluşturuldu; feature branch'e push edildi ve PR #1 ile `main` dalına merge edildi.
+- PR #1, `26732e6fe66a5eae8dd1f67036699f843a9d04d0` merge commit'iyle `main` dalına alındı. Yerel `main`, `origin/main` ve `HEAD` bu commit'te eşleşiyor; feature branch yerelde ve uzak repository'de korunuyor.
+- FLOW-001.11b için SonarQube Cloud koşulları 2026-07-06 tarihinde resmî Sonar/GitHub belgelerinden yenilendi: Free plan public projelerde sınırsız proje, en fazla 5 üye, ana dal ve hedefi ana dal olan PR analizi sunuyor; LOC sınırı aşımında analiz duruyor ve otomatik ücret oluşmuyor.
+- GitHub App erişiminin yalnız `FLOWLOGIX` ile sınırlandırılması, auto-import'un kapatılması, import sonrası automatic analysis'in kapatılması ve CI tabanlı ilk kabul edilen analizin C# ile sınırlanması önerildi. TypeScript resmî destek üst sınırı hâlâ `5.9.3`; FlowLogix `6.0.3` kullanıyor.
+- Free planda CI token'ının kullanıcıya bağlı PAT olduğu, repository düzeyindeki `SONAR_TOKEN` secret'ında tutulacağı ve kapatmada secret silme + token revoke + Sonar proje/organizasyon silme + GitHub App uninstall adımlarının ayrı ayrı gerektiği kaydedildi. Henüz hiçbir dış hizmet bağlantısı, import, token, secret veya workflow değişikliği yapılmadı.
+- Kullanıcı 2026-07-06 tarihinde yalnız şu FLOW-001.11b işlemlerini açıkça onayladı: EU SonarQube Cloud'a GitHub ile giriş; GitHub App'i yalnız `FLOWLOGIX` için kurma; Free organizasyon oluşturup auto-import'u kapatma; public repository'yi import edip automatic analysis'i kapatma; Free PAT üretip repository düzeyi `SONAR_TOKEN` secret'ını oluşturma. Workflow/kod değişikliği, commit, push ve deployment bu onaya dahil değildir.
+- Chrome üzerinden etkileşimli kurulum denemesi Windows oturum izni hatası (`CreateProcessWithLogonW failed: 5`) nedeniyle başlatılamadı. GitHub CLI repository secret listesi boş döndü; mevcut App kurulumunu sorgulayan API ise kullanılan CLI token'ıyla installation sorgusuna izin vermediği için App izin kapsamı bağımsız olarak doğrulanamadı.
+- Kullanıcının paylaştığı SonarQube Cloud ekranı; `Muhammed Yasin Özdemir` organizasyonunun `muhammedyasinozdemirdev` anahtarıyla Free plan üzerinde başarıyla oluşturulduğunu doğruladı. Kullanıcı auto-import seçeneğini kapattığını bildirdi; bu ayar ekranda görünmediği için kullanıcı beyanı olarak kaydedildi.
+- Kullanıcı yalnız `FLOWLOGIX` repository'sini seçti; seçim ekranı tek public proje oluşturulacağını doğruladı. `Set Up` sonrasında `MuhammedYasinOzdemirDev_FLOWLOGIX` projesi public olarak oluşturuldu.
+- Import, automatic analysis'i kendiliğinden başlattı. Paylaşılan Summary ekranında `main`, yaklaşık `1.4k Lines of Code`, `26732e6f` commit'i, 1 security, 1 reliability ve 3 maintainability bulgusu göründü; quality gate `Not computed` durumundaydı. TypeScript `6.0.3` resmî destek üst sınırının üzerinde olduğu ve C#-önce kararı korunduğu için bu otomatik sonuç kabul edilen kalite taban çizgisi sayılmadı.
+- Kullanıcının paylaştığı `Administration > Analysis Method` ekranında Automatic Analysis anahtarının kapalı olduğu doğrulandı. Proje artık kendiliğinden analiz çalıştırmayacak; sonraki kabul edilen analiz CI-based SonarScanner for .NET ile C# kapsamına alınacak.
+- Kullanıcının paylaştığı `Project onboarding > GitHub Actions` ekranında Sonar tarafından üretilen `SONAR_TOKEN` değeri görünür durumdaydı. Değer screenshot/sohbet bağlamına girdiği için güvenlik açısından kullanılmayacak; token SonarQube Cloud tarafında revoke edilip yeni token yalnız GitHub repository secret'ına aktarılacak.
+- Kullanıcının paylaştığı `My account > Access Tokens` ekranında personal token listesinin boş olduğu görüldü. Böylece ekranda görünen eski token'ın Sonar hesabında artık aktif olmadığı doğrulandı; yeni token değeri paylaşılmadan GitHub repository secret'ına eklenecek.
+- Kullanıcı yeni Sonar personal token'ını GitHub repository secret'ı olarak ekledi. `gh secret list --repo MuhammedYasinOzdemirDev/FLOWLOGIX --json name,updatedAt` değeri göstermeden `SONAR_TOKEN` kaydını `2026-07-08T11:23:37Z` güncellenme zamanı ile doğruladı.
+- Kullanıcı SonarQube Cloud'un `.NET` GitHub Actions onboarding YAML örneğini paylaştı. Örnek ayrı `SonarQube` workflow'u, `windows-latest`, JDK 17, checkout `fetch-depth: 0`, scanner cache ve `dotnet-sonarscanner begin/build/end` akışını içeriyor. FlowLogix'te mevcut `CI` workflow'u bulunduğu için bu örnek birebir kopyalanmayacak; mevcut deterministik CI politikasına, source sınırına ve TypeScript analiz ertelemesine göre uyarlanacak.
+- Kullanıcı, kaynak/config/workflow dosyalarını varsayılan olarak kendisinin yazacağını tekrar hatırlattı. Bu nedenle agent FLOW-001.11c/11d için dosya oluşturmayacak; tam komut ve beklenen içerikleri verecek, kullanıcı uyguladıktan sonra gerçek dosyayı okuyup doğrulayacak.
+- NuGet Gallery üzerinde `dotnet-sonarscanner 11.2.1` güncel sürüm olarak doğrulandı; paket .NET 10 ile uyumlu computed target framework listesine sahip. Repository kökünde henüz `.config/dotnet-tools.json` bulunmuyor.
+- Kullanıcı local tool manifest'i kökte `dotnet-tools.json` olarak oluşturdu. Dosya `dotnet-sonarscanner 11.2.1`, `commands: ["dotnet-sonarscanner"]` ve `rollForward: false` içeriyor. `dotnet tool restore`, `dotnet tool list --local` ve `dotnet tool run dotnet-sonarscanner --version` SonarScanner for .NET `11.2.1` sonucunu doğruladı.
+- Kullanıcı `.github/workflows/sonarqube.yml` dosyasını oluşturdu. Workflow ayrı `SonarQube` adıyla `pull_request` ve `main` push üzerinde çalışacak; `contents: read`, `fetch-depth: 0`, pinned checkout/setup-dotnet/setup-java action'ları, `dotnet tool restore`, Release solution restore/build ve `SONAR_TOKEN` secret referansı içeriyor. Token değeri dosyaya yazılmadı.
+- İlk doğrulamada `sonarqube.yml` CRLF satır sonu ve Prettier format farkı nedeniyle kırmızıydı. Kullanıcı Prettier uyguladıktan sonra dosya `55` LF ve `0` CRLF olarak doğrulandı; Prettier check ve `git diff --check` geçti.
+- Sonar'a veri gönderen `dotnet-sonarscanner begin/end` yerelde çalıştırılmadı. Yerel eşdeğer kapılar olarak `dotnet tool restore`, `dotnet tool list --local`, `dotnet restore .\FlowLogix.sln`, Release solution build ve Release `dotnet test --no-build --no-restore` çalıştı; 5 proje `0` uyarı/`0` hata ve 2/2 geçici test başarılı.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
 
@@ -244,7 +264,7 @@
 
 ## Açık durum ve riskler
 
-- Frontend source/tooling, çalışma kuralları ve yaşayan proje hafızası niyet bazlı commit gruplarıyla kaydedildi ve `feature/FLOW-001-foundation` branch'ine push edildi; taslak PR #1 açıktır.
+- Frontend source/tooling, çalışma kuralları ve yaşayan proje hafızası niyet bazlı commit gruplarıyla kaydedildi; PR #1 merge edildi ve değişiklikler `main` dalındadır.
 - `FlowLogix.Customers.csproj` için çalışma ağacı ve index içerik hash'lerinin aynı olduğu doğrulandı; CRLF/LF stat bilgisi içerik commit'i oluşturmadan yenilendi ve çalışma ağacı temizlendi.
 - `.vs/` ignore kuralı kullanıcı tarafından eklendi ve doğrulandı.
 - İki `Test1.cs` yalnız MTP keşif altyapısını doğrulayan geçici şablon testidir; gerçek domain/integration kapsamı gibi sayılmamalı ve ilk gerçek testlerle değiştirilmelidir.
@@ -252,10 +272,12 @@
 - SQL Server bağlantı biçimi ve development database adı source adımında doğrulanmalı; secret repository'ye yazılmamalı.
 - Paket exact sürümleri kurulum anında resmi kaynak/NuGet/npm üzerinden tekrar doğrulanmalı.
 - GitHub CLI `2.96.0` kurulu ve `MuhammedYasinOzdemirDev` hesabına Windows keyring üzerinden bağlıdır. Dış hizmet ve secret işlemleri yine task-bazlı kullanıcı onayı gerektirir.
-- SonarQube Cloud project import ve `SONAR_TOKEN` oluşturma dış hizmet işlemi olduğundan kullanıcı tarafından yapılmalı.
+- SonarQube Cloud project import kullanıcı tarafından yapıldı; ekranda görünen eski `SONAR_TOKEN` değeri kullanılmayacak şekilde revoke edildi. Yeni token değeri paylaşılmadan GitHub repository `SONAR_TOKEN` secret'ına eklendi ve adı/zamanı doğrulandı.
+- `dotnet-tools.json` kök manifest'i doğrulandı; local tool restore/list ve scanner version komutları `dotnet-sonarscanner 11.2.1` sonucunu verdi.
+- `.github/workflows/sonarqube.yml` kullanıcı tarafından oluşturuldu ve yerelde doğrulandı: Prettier/LF/whitespace temiz, Release restore/build/test yeşil. İlk gerçek Sonar analizi remote workflow çalışmasıyla kanıtlanacak; commit/push açık onay bekliyor.
 - SonarQube Cloud resmi TypeScript tam desteği `5.9.3`; FlowLogix TypeScript 6 frontend analizi açılmadan yeniden doğrulanmalı.
 - Azure deployment hedefi henüz kullanıcı tarafından onaylanmadı. App Service F1 demo sınırları gerçek işletme production kapasitesi sayılmayacak; bulut kaynağı ve federated credential onaysız oluşturulmayacak.
-- Agent kural tazelemesi, uzak CI kapanışı ve deployment planını taşıyan sekiz dokümantasyon dosyası çalışma ağacında commit edilmemiş durumdadır.
+- Agent kural tazelemesi, uzak CI kapanışı ve deployment planını taşıyan sekiz dokümantasyon dosyası `4a3897f` commit'inde kaydedildi ve PR #1 ile `main` dalına merge edildi.
 - API development HTTPS sertifikası trusted; Vite proxy Node process'inin system CA kullanması project `.npmrc` ile uygulandı ve gerçek proxy isteğinde doğrulandı.
 - Prettier format kapısı ve ilk baseline doğrulandı; format check yeşil. Vite demo ekranı, testi ve kullanılmayan görselleri kaldırıldı.
 - Word belgesinin görsel render kontrolü ortamda LibreOffice bulunmadığı için yapılamadı; içerik OOXML ve metin/tablo çıkarımıyla okundu.
@@ -273,7 +295,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-Yarın önce çalışma ağacındaki sekiz dokümantasyon dosyasının kapsamı yeniden doğrulanacak ve commit/push için kullanıcıdan açık onay istenecek. Bu kayıt güvenceye alındıktan sonra FLOW-001.11b SonarQube Cloud bağlantısına geçilecek.
+Kullanıcı açık onay verirse `dotnet-tools.json`, `.github/workflows/sonarqube.yml` ve ilgili Markdown güncellemeleri küçük, niyet odaklı commit olarak kaydedilip `main` dalına push edilecek; ardından ilk remote SonarQube workflow koşusu izlenecek. Onay gelmeden commit/push yapılmayacak.
 
 ## Yeni sohbet okuma sırası
 

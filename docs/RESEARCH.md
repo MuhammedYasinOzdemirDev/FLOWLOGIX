@@ -636,6 +636,61 @@ Taslak PR #1 açıldıktan sonra ilk Backend işi, geçişli `Microsoft.OpenApi 
 
 Yerel Release restore/build/test ve geçişli vulnerability taraması temiz tamamlandı. Düzeltme push edildikten sonraki GitHub-hosted Ubuntu koşusunda Backend `27s`, Frontend `28s` içinde geçti; başarısız veya bekleyen iş kalmadı. Böylece CI workflow'un gerçek event, Linux dosya sistemi ve temiz runner davranışı doğrulandı.
 
+### 2026-07-06 — FLOW-001.11b güncel hazırlık doğrulaması
+
+GitHub CLI üzerinden `MuhammedYasinOzdemirDev/FLOWLOGIX` repository'sinin hâlâ `PUBLIC`, varsayılan dalının `main` ve PR #1'in `26732e6fe66a5eae8dd1f67036699f843a9d04d0` commit'iyle `MERGED` olduğu yeniden doğrulandı.
+
+#### Ücretsiz plan ve ücret sınırı
+
+- SonarQube Cloud Free plan sınırsız sayıda public proje analizine izin veriyor; private projeler için toplam sınır 50k LOC. Free organizasyonda en fazla 5 üye bulunabiliyor.
+- Free plan branch analizini yalnız ana dalla sınırlar. PR analizi yalnız hedef dal `main` olduğunda kullanılabilir. FlowLogix'in `main` tabanlı kısa ömürlü branch akışı bu sınırla uyumludur.
+- Free kayıt akışı doğrudan `Select free` ile tamamlanır. Kredi kartı ve ödeme bilgisi Team plan/14 günlük deneme akışında istenir; bu nedenle deneme/Team seçilmeyecek.
+- LOC sınırı aşılamaz: SonarQube Cloud analizi çalıştırmaz ve hata döndürür. Free plandan kendiliğinden ücretli plana geçiş veya kota aşımı ücreti belgelenmiyor.
+- OSS plan da ücretsizdir ve public open-source organizasyonlara sınırsız branch/PR özellikleri verir; fakat FlowLogix'in mevcut ihtiyacı Free planla karşılandığı için ayrıca OSS kapsamı talep edilmeyecek.
+
+#### GitHub erişimi ve veri akışı
+
+1. Kullanıcı `sonarcloud.io` EU bölgesinde GitHub hesabıyla giriş yapar. SonarQube Cloud organizasyonu GitHub kişisel hesabına/organizasyonuna bire bir bağlanır.
+2. SonarQubeCloud GitHub App kurulurken repository access `Only select repositories` olarak yalnız `FLOWLOGIX` ile sınırlandırılır. GitHub kurulum ekranındaki gerçek izin listesi onaydan önce ayrıca okunur.
+3. Yeni repository'leri otomatik içeri alan beta özellik import akışında varsayılan açık olabildiği için açıkça kapatılır.
+4. `FLOWLOGIX` import edildiğinde SonarQube Cloud uygunluk görürse ilk automatic analysis'i kendiliğinden başlatabilir ve public kaynak kodunu okuyabilir. Bu nedenle import sonrası `Administration > Analysis Method` altında automatic analysis hemen kapatılır; oluşmuş bir otomatik sonuç güvenilir CI kanıtı sayılmaz.
+5. Kabul edilen analiz modeli CI-based SonarScanner for .NET'tir. GitHub Actions runner'ı repository'yi checkout eder; scanner kaynakları analiz eder ve kaynak/analiz verisini HTTPS üzerinden SonarQube Cloud'a gönderir. SonarQube Cloud mevcut analiz kaynak kodunu, ölçüleri ve geçmiş sonuçları kendi retention politikasına göre saklar.
+
+#### `SONAR_TOKEN` güvenliği
+
+- Free plan CI analizi için kullanıcıya bağlı Personal Access Token kullanır; proje kapsamlı Scoped Organization Token yalnız Team/Enterprise planlarında bulunur. Bu nedenle Free token, analiz dışında Sonar web API çağrılarında da kullanıcı yetkileriyle kullanılabilen daha geniş bir sırdır.
+- Token yalnız bir kez gösterilir. `flowlogix-github-actions` gibi amacını anlatan ayrı adla üretilecek, yalnız repository düzeyindeki `SONAR_TOKEN` Actions secret'ına kopyalanacak; Markdown, YAML, appsettings, terminal çıktısı veya yerel dosyaya yazılmayacak.
+- 2026-07-08 kurulumunda Sonar onboarding ekranındaki token değeri screenshot/sohbet bağlamında göründüğü için kullanılmayacak; olay sızıntı gibi ele alınacak, ilgili PAT Sonar `My Account > Security` altında revoke edilip yeni token değeri paylaşılmadan GitHub repository secret'ına yazılacak.
+- GitHub secret değeri workflow'a ancak açıkça `secrets.SONAR_TOKEN` ile bağlanır. Fork PR ve Dependabot kaynaklı workflow'lara Actions secret verilmez. Yine de write erişimi olan workflow yazarları secret'ı kullanabildiği için workflow değişiklikleri inceleme gerektirir.
+- PAT kullanılmadığı 60 gün sonunda SonarQube Cloud tarafından otomatik kaldırılır. Şüpheli sızıntıda önce Sonar tarafında revoke edilir, ardından GitHub secret silinir ve gerekiyorsa yeni token üretilir.
+
+#### Kapatma ve geri alma sırası
+
+1. CI workflow'daki Sonar adımlarını ayrı onaylı kaynak değişikliğinde kaldır.
+2. GitHub repository ayarından `SONAR_TOKEN` secret'ını sil ve Sonar hesabında PAT'i revoke et.
+3. SonarQube Cloud projesini `Administration > Deletion` üzerinden sil; hizmet tümden bırakılacaksa organizasyonu da sil.
+4. Sonar proje/organizasyon kaydı kaldırıldıktan sonra GitHub App erişimini kaldır veya uygulamayı uninstall et; böylece belgelenen stale/phantom binding riski azaltılır.
+5. Gerekirse Sonar kullanıcı hesabını ayrıca sil. Yalnız bir yıl inaktif kalmayı beklemek geri alma yöntemi sayılmaz; Free projeler bir yıl analiz edilmezse otomatik silinse de açık silme adımı tercih edilir.
+
+#### Sonuç ve önerilen onay kapsamı
+
+Free plan + EU bölgesi + yalnız `FLOWLOGIX` repository erişimi + auto-import kapalı + automatic analysis kapalı + repository düzeyi `SONAR_TOKEN` önerilir. Bu hazırlık yalnız dış hizmet kapsamını netleştirdi; hesap bağlantısı, GitHub App kurulumu, Sonar organizasyonu/projesi, token, secret veya workflow henüz oluşturulmadı/değiştirilmedi.
+
+### Güncel doğrulama kaynakları
+
+- [Sonar — Subscription plans](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/subscription-plans)
+- [Sonar — Signing up for a plan](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/signing-up-for-plan)
+- [Sonar — Importing GitHub organization](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-organization/creating-organization/importing-github-organization)
+- [Sonar — Automatic analysis](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/automatic-analysis)
+- [Sonar — GitHub Actions CI-based analysis](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/ci-based-analysis/github-actions-for-sonarcloud)
+- [Sonar — Managing Personal Access Tokens](https://docs.sonarsource.com/sonarqube-cloud/managing-your-account/managing-tokens)
+- [Sonar — JavaScript/TypeScript/CSS support](https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/languages/javascript-typescript-css)
+- [Sonar — Housekeeping and retention](https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/housekeeping)
+- [Sonar — Deleting project](https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/administering-your-projects/deleting-project)
+- [Sonar — Deleting organization](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-organization/creating-organization/deleting-organization)
+- [GitHub — Reviewing and modifying installed GitHub Apps](https://docs.github.com/en/apps/using-github-apps/reviewing-and-modifying-installed-github-apps)
+- [GitHub — Using secrets in GitHub Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
+
 ### Kaynaklar
 
 - [GitHub — Building and testing .NET](https://docs.github.com/en/actions/tutorials/build-and-test-code/net)

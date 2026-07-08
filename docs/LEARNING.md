@@ -331,3 +331,29 @@ FLOW-001 SonarQube ve ilk deployment temelinde:
 - **Güvenlik etkisi:** Deployment kimliği için uzun ömürlü publish profile yerine kısa ömürlü GitHub OIDC kimliği; uygulama secret'ları için repository yerine App Service ayarları tercih edilir.
 - **Zamanlama:** Bulut SQL kaynağı boş foundation için kurulmaz; ilk gerçek migration hazır olduğunda açılır. Bu erteleme mimari kaçış değil, henüz kullanılmayan kalıcı ve güvenlik duyarlı kaynağı oluşturmama disiplinidir.
 - **Yaygın hata:** Yalnız web host ücretsiz diye bütün sistemin ücretsiz ve production-ready olduğunu sanmak, otomatik ücret seçeneğini açık bırakmak veya migration'ı uygulama başlangıcında kontrolsüz çalıştırmak.
+
+## L-038 — Dış analiz hizmetinde import işlemi veri akışını başlatabilir
+
+- **Bağlam:** FLOW-001.11b SonarQube Cloud hazırlığı
+- **Başlangıç seviyesi:** Repository'yi bir analiz hizmetine eklemek yalnız boş bir proje kartı açmak değildir. GitHub App kaynak koda erişebilir ve import sonrasında otomatik analiz hemen başlayabilir.
+- **Plan sınırı:** Free plan public projeleri ücretsiz analiz eder; üye, dal ve PR özellikleri sınırlıdır. LOC sınırı aşılırsa analiz durur, kendiliğinden ücretli plana geçilmez. Free ile Team denemesi aynı seçim değildir.
+- **Güvenlik etkisi:** Free planın `SONAR_TOKEN` değeri kullanıcıya bağlı PAT'tir ve yalnız analiz hakkına daraltılmış organizasyon token'ı değildir. Bu yüzden repository secret'ında tutulur, workflow'a yalnız gerekli adımda verilir ve sızıntıda Sonar tarafında revoke edilir.
+- **Secret hijyeni:** Bir token ekranda, ekran görüntüsünde veya sohbet bağlamında görünürse artık güvenli sır kabul edilmez. Değer koda yazılmamış olsa bile revoke edilip yenisi üretilir; yeni değer yalnız GitHub secret alanına yapıştırılır ve doğrulama için token değeri değil secret adı/listesi paylaşılır.
+- **Uyumluluk etkisi:** FlowLogix TypeScript `6.0.3`, Sonar'ın resmî `5.9.3` üst sınırının üzerindedir. Automatic analysis kapatılacak; ilk kabul edilen tarama CI tabanlı ve C# ile sınırlı olacaktır.
+- **Geri alma:** Secret silme, token revoke, Sonar proje/organizasyon silme ve GitHub App uninstall ayrı katmanlardır. Yalnız workflow satırını kaldırmak dış hizmet erişimini ve saklanan analiz verisini sonlandırmaz.
+- **Yaygın hata:** “Repository zaten public” diyerek uygulama yetkisini sınırsız vermek, auto-import'u açık bırakmak, Team denemesini Free sanmak veya secret'ı YAML içine yazmak.
+## L-039 — Local tool manifest CI aracını repository sözleşmesine çevirir
+
+- **Bağlam:** FLOW-001.11c SonarScanner for .NET exact sürüm sabitlemesi
+- **Başlangıç seviyesi:** Local tool manifest, projeye özel küçük bir araç listesi gibidir. Yeni geliştirici veya CI runner `dotnet tool restore` dediğinde aynı araç ve aynı sürüm kurulur.
+- **Tekrarlanabilirlik etkisi:** `dotnet tool update` ile her çalıştırmada son sürümü almak yerine `dotnet-sonarscanner 11.2.1` manifest içinde tutulur. Böylece bugünkü çalışan analiz hattı yarın farklı scanner davranışıyla sessizce değişmez.
+- **Dosya yolu notu:** Bu kurulumda manifest kökte `dotnet-tools.json` olarak oluştu ve `dotnet tool list --local` tarafından geçerli local manifest olarak doğrulandı. Önemli kanıt varsayılan yol beklentisi değil, .NET CLI'ın restore/list/run komutlarıyla aynı manifesti kullanmasıdır.
+- **Yaygın hata:** Tool manifest dosyasını commit etmeyi unutmak, scanner sürümünü workflow içinde belirsiz `latest` davranışına bırakmak veya local tool restore yapılmadan CI'da scanner komutunu çağırmak.
+## L-040 — Sonar workflow yerel doğrulama ile remote kanıtı ayırır
+
+- **Bağlam:** FLOW-001.11d CI-based SonarQube Cloud workflow'u
+- **Başlangıç seviyesi:** Workflow dosyası bir otomasyon tarifidir; dosyanın düzgün yazılması, GitHub'da gerçekten çalıştığı anlamına gelmez. Yerelde biçim ve build doğrulanır, dış hizmete gönderim ise ancak remote koşuda kanıtlanır.
+- **Secret akışı:** `SONAR_TOKEN` dosyada değer olarak bulunmaz; GitHub Actions çalışırken secret kasasından ortam değişkeni olarak gelir. Loglarda token değeri yazdırılmamalı, yalnız secret adı kullanılmalıdır.
+- **Kapsam ayrımı:** `sonar.scanner.scanAll=false`, ilk aşamada C#/.NET analizini güvenilir tutar ve TypeScript 6 uyumluluk riski çözülene kadar frontend taramasını ertelemeye yarar.
+- **Doğrulama ayrımı:** Prettier/LF/whitespace ve Release restore/build/test yerel dosya kalitesini kanıtlar. İlk kabul edilen Sonar sonucu için workflow commit/push sonrası GitHub-hosted runner'daki gerçek koşu ayrıca izlenmelidir.
+- **Yaygın hata:** Workflow dosyasını ekleyince Sonar kurulumu tamamlandı sanmak, token'ı YAML içine yazmak veya automatic analysis sonucunu CI-based kalite tabanı saymak.

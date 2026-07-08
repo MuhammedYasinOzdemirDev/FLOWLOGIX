@@ -91,8 +91,8 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
   - [x] FLOW-001.10f — İlk remote workflow sonucunu incelemeden required check/branch protection açma
 - [ ] FLOW-001.11 — SonarQube Cloud statik analizini aşamalı kur
   - [x] FLOW-001.11a — SonarQube Cloud, self-hosted Server ve GitHub-native alternatifleri karşılaştır
-  - [ ] FLOW-001.11b — Kullanıcı public repository'yi SonarQube Cloud'a bağlasın ve `SONAR_TOKEN` repository secret'ını oluştursun
-  - [ ] FLOW-001.11c — SonarScanner for .NET'i local tool manifest ile exact sürüme sabitle
+  - [x] FLOW-001.11b — Kullanıcı public repository'yi SonarQube Cloud'a bağlasın ve `SONAR_TOKEN` repository secret'ını oluştursun
+  - [x] FLOW-001.11c — SonarScanner for .NET'i local tool manifest ile exact sürüme sabitle
   - [ ] FLOW-001.11d — İlk aşamada C# analizini CI-based scanner ile çalıştır; token olmayan fork akışını güvenli ele al
   - [ ] FLOW-001.11e — Sonar TypeScript 6 desteği doğrulanınca frontend multi-language analizini aç
   - [ ] FLOW-001.11f — Gerçek testler oluşunca coverage üretimini/import'unu ve quality-gate bloklamasını etkinleştir
