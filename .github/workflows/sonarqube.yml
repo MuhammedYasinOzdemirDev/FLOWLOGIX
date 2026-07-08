@@ -1,0 +1,55 @@
+name: SonarQube
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sonarqube-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dotnet-analysis:
+    name: .NET analysis
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Repository kaynaklarını al
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: .NET SDK'yı hazırla
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          global-json-file: global.json
+
+      - name: Java 17 ortamını hazırla
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Local .NET araçlarını geri yükle
+        run: dotnet tool restore
+
+      - name: NuGet paketlerini geri yükle
+        run: dotnet restore .\FlowLogix.sln
+
+      - name: SonarQube analizini çalıştır
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          dotnet tool run dotnet-sonarscanner begin /k:"MuhammedYasinOzdemirDev_FLOWLOGIX" /o:"muhammedyasinozdemirdev" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.scanner.scanAll=false
+          dotnet build .\FlowLogix.sln --configuration Release --no-restore
+          dotnet tool run dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
