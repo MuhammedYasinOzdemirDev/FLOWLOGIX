@@ -4,7 +4,7 @@
 
 - **Milestone:** Faz 0 — Bağlam ve çalışma zemini
 - **Epic/Task:** FLOW-001 — Dokümantasyon ve temel iskelet
-- **Aktif alt task:** FLOW-001.11d — SonarQube workflow'u kullanıcı tarafından oluşturuldu ve yerel kapılar geçti; ilk remote Sonar analizi için commit/push açık onayı bekleniyor
+- **Aktif alt task:** FLOW-002 hazırlığı — SonarQube Cloud ilk CI-based .NET analizi tamamlandı; deployment sonraki fazlara ertelendi, sırada kod odaklı Identity ve güvenli oturum planı var
 - **Branch:** `main`; `origin/main` ile aynı commit'te
 - **Son doğrulanan commit:** `26732e6` — `Merge pull request #1 from MuhammedYasinOzdemirDev/feature/FLOW-001-foundation`
 - **Dokümantasyon durumu:** Sekiz belgeli son grup `4a3897f` (`docs: refresh collaboration and deployment roadmap`) commit'inde; PR #1 ile `main` dalına merge edildi. Bu PROGRESS düzeltmesi öncesinde çalışma ağacı temizdi.
@@ -189,6 +189,10 @@
 - Kullanıcı `.github/workflows/sonarqube.yml` dosyasını oluşturdu. Workflow ayrı `SonarQube` adıyla `pull_request` ve `main` push üzerinde çalışacak; `contents: read`, `fetch-depth: 0`, pinned checkout/setup-dotnet/setup-java action'ları, `dotnet tool restore`, Release solution restore/build ve `SONAR_TOKEN` secret referansı içeriyor. Token değeri dosyaya yazılmadı.
 - İlk doğrulamada `sonarqube.yml` CRLF satır sonu ve Prettier format farkı nedeniyle kırmızıydı. Kullanıcı Prettier uyguladıktan sonra dosya `55` LF ve `0` CRLF olarak doğrulandı; Prettier check ve `git diff --check` geçti.
 - Sonar'a veri gönderen `dotnet-sonarscanner begin/end` yerelde çalıştırılmadı. Yerel eşdeğer kapılar olarak `dotnet tool restore`, `dotnet tool list --local`, `dotnet restore .\FlowLogix.sln`, Release solution build ve Release `dotnet test --no-build --no-restore` çalıştı; 5 proje `0` uyarı/`0` hata ve 2/2 geçici test başarılı.
+- Kullanıcı onayıyla `76664e5 ci: add SonarQube .NET analysis workflow` ve `1af7bc7 docs: record SonarQube setup progress` commitleri oluşturulup `main` dalına push edildi.
+- Push sonrası remote GitHub Actions sonuçları doğrulandı: `SonarQube` run `28940499482` `success`, `.NET analysis` işi `1m54s`; mevcut `CI` run `28940499475` `success`, Backend ve Frontend işleri başarılı. SonarQube run URL: `https://github.com/MuhammedYasinOzdemirDev/FLOWLOGIX/actions/runs/28940499482`.
+- Sonar annotation'ları ilk kalite bulgusu olarak kaydedildi: `tests/FlowLogix.Customers.UnitTests/Test1.cs` ve `tests/FlowLogix.Customers.IntegrationTests/Test1.cs` için S2699 assertion yok; `src/FlowLogix.Api/Program.cs` için S6966 `RunAsync` await edilmelidir ve S1118 generated `Program` class için static/protected constructor önerisi; `actions/setup-java` pinned sürümü Node.js 20 deprecation uyarısı veriyor. Bu bulgular FLOW-001.11d'yi kırmadı ancak sonraki bakım/gerçek test adımlarında ele alınacak.
+- Kullanıcı 2026-07-08 tarihinde deployment'ı sonraki fazlara ertelemeye ve şimdilik kod odaklı ilerlemeye karar verdi. Bu nedenle FLOW-001.12 bulut kaynağı/secret/OIDC/public URL işleri aktif akıştan çıkarıldı; Azure App Service Free F1 araştırması ileride yeniden doğrulanacak öneri olarak saklanacak.
 
 ## Kullanıcı tarafından uygulanan kaynak dosyalar
 
@@ -274,9 +278,10 @@
 - GitHub CLI `2.96.0` kurulu ve `MuhammedYasinOzdemirDev` hesabına Windows keyring üzerinden bağlıdır. Dış hizmet ve secret işlemleri yine task-bazlı kullanıcı onayı gerektirir.
 - SonarQube Cloud project import kullanıcı tarafından yapıldı; ekranda görünen eski `SONAR_TOKEN` değeri kullanılmayacak şekilde revoke edildi. Yeni token değeri paylaşılmadan GitHub repository `SONAR_TOKEN` secret'ına eklendi ve adı/zamanı doğrulandı.
 - `dotnet-tools.json` kök manifest'i doğrulandı; local tool restore/list ve scanner version komutları `dotnet-sonarscanner 11.2.1` sonucunu verdi.
-- `.github/workflows/sonarqube.yml` kullanıcı tarafından oluşturuldu ve yerelde doğrulandı: Prettier/LF/whitespace temiz, Release restore/build/test yeşil. İlk gerçek Sonar analizi remote workflow çalışmasıyla kanıtlanacak; commit/push açık onay bekliyor.
+- `.github/workflows/sonarqube.yml` kullanıcı tarafından oluşturuldu, yerelde doğrulandı ve `main` dalına push edildikten sonra remote `SonarQube` workflow'u başarıyla tamamlandı. İlk kabul edilen CI-based SonarQube .NET analizi `1af7bc7` commit'i üzerinde alındı.
+- İlk Sonar kalite bulguları henüz düzeltilmedi: geçici testlerde assertion eksikliği, `Program.cs` async/static analyzer önerileri ve `actions/setup-java` Node 20 deprecation uyarısı takip edilecek.
 - SonarQube Cloud resmi TypeScript tam desteği `5.9.3`; FlowLogix TypeScript 6 frontend analizi açılmadan yeniden doğrulanmalı.
-- Azure deployment hedefi henüz kullanıcı tarafından onaylanmadı. App Service F1 demo sınırları gerçek işletme production kapasitesi sayılmayacak; bulut kaynağı ve federated credential onaysız oluşturulmayacak.
+- Azure deployment hedefi 2026-07-08 kullanıcı kararıyla sonraki fazlara ertelendi. App Service F1 araştırması saklıdır ancak aktif akışta bulut kaynağı, secret, federated credential veya public URL oluşturulmayacak.
 - Agent kural tazelemesi, uzak CI kapanışı ve deployment planını taşıyan sekiz dokümantasyon dosyası `4a3897f` commit'inde kaydedildi ve PR #1 ile `main` dalına merge edildi.
 - API development HTTPS sertifikası trusted; Vite proxy Node process'inin system CA kullanması project `.npmrc` ile uygulandı ve gerçek proxy isteğinde doğrulandı.
 - Prettier format kapısı ve ilk baseline doğrulandı; format check yeşil. Vite demo ekranı, testi ve kullanılmayan görselleri kaldırıldı.
@@ -295,7 +300,7 @@ Bkz. `docs/DECISIONS.md`.
 
 ## Sıradaki tek ve kesin adım
 
-Kullanıcı açık onay verirse `dotnet-tools.json`, `.github/workflows/sonarqube.yml` ve ilgili Markdown güncellemeleri küçük, niyet odaklı commit olarak kaydedilip `main` dalına push edilecek; ardından ilk remote SonarQube workflow koşusu izlenecek. Onay gelmeden commit/push yapılmayacak.
+Bu remote sonuç ve deployment erteleme dokümantasyonu commit/push edilecek; ardından kod odaklı devam için FLOW-002 Identity ve güvenli oturum başlangıç planı kullanıcıya öğretici sırayla sunulacak. Kaynak kodu kullanıcı yazacak; agent yalnız dosya yolu, kod ve doğrulama adımlarını verecek.
 
 ## Yeni sohbet okuma sırası
 

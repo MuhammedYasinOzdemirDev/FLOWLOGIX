@@ -356,4 +356,12 @@ FLOW-001 SonarQube ve ilk deployment temelinde:
 - **Secret akışı:** `SONAR_TOKEN` dosyada değer olarak bulunmaz; GitHub Actions çalışırken secret kasasından ortam değişkeni olarak gelir. Loglarda token değeri yazdırılmamalı, yalnız secret adı kullanılmalıdır.
 - **Kapsam ayrımı:** `sonar.scanner.scanAll=false`, ilk aşamada C#/.NET analizini güvenilir tutar ve TypeScript 6 uyumluluk riski çözülene kadar frontend taramasını ertelemeye yarar.
 - **Doğrulama ayrımı:** Prettier/LF/whitespace ve Release restore/build/test yerel dosya kalitesini kanıtlar. İlk kabul edilen Sonar sonucu için workflow commit/push sonrası GitHub-hosted runner'daki gerçek koşu ayrıca izlenmelidir.
+- **Remote sonuç:** İlk `SonarQube` push koşusu başarıyla tamamlandı ve analyzer uyarıları üretti. Bu, entegrasyonun çalıştığını gösterir; uyarıların varlığı task başarısızlığı değil, sonraki kod/test bakım girdisidir.
 - **Yaygın hata:** Workflow dosyasını ekleyince Sonar kurulumu tamamlandı sanmak, token'ı YAML içine yazmak veya automatic analysis sonucunu CI-based kalite tabanı saymak.
+## L-041 — Araştırma önerisi ile aktif uygulama kararı ayrı şeylerdir
+
+- **Bağlam:** 2026-07-08 deployment erteleme ve kod odaklı devam kararı
+- **Başlangıç seviyesi:** Bir konuyu araştırıp en uygun seçeneği kaydetmek, onu hemen kurmak anlamına gelmez. Deployment için Azure App Service Free F1 önerisi saklanır; kullanıcı aktif fazdan çıkardığında kaynak açma ve kurulum yapılmaz.
+- **Süreç disiplini:** Karar değiştiğinde `BACKLOG`, `ROADMAP`, `DECISIONS`, `PROGRESS` ve gerekirse `LEARNING` aynı turda uyumlu güncellenir. `PROGRESS` sıradaki tek adımı göstermeli; eski deployment adımı aktif kalmamalıdır.
+- **Yetki sınırı:** Kaynak kodu varsayılan olarak kullanıcı yazar. Agent, kod odaklı fazda önce amaç/ekran sonucu/parçalar/veri akışı/dosyalar/kod/doğrulama sırasıyla anlatır; kullanıcı uyguladıktan sonra gerçek dosyayı okuyup build/test yapar.
+- **Yaygın hata:** Araştırılmış bir dış hizmeti otomatik sıradaki iş sanmak, “olur” yanıtını komşu tasklara taşımak veya yaşayan belgelerdeki sıradaki adımı güncellemeden yeni konuya geçmek.

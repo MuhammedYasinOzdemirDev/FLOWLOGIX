@@ -19,15 +19,15 @@
 - Solution/proje iskeleti
 - Backend ve frontend için ilk build
 - GitHub Actions ve aşamalı SonarQube Cloud kalite zemini
-- SonarQube sonrasında ücretsiz ortamda ilk demo deployment provası
+- Ücretsiz demo deployment araştırması; uygulama provası 2026-07-08 kullanıcı kararıyla sonraki faza ertelendi
 
 ### Çıkış ölçütü
 
-Repository'de belgeler ve kullanıcı tarafından oluşturulmuş çalışan solution bulunur; backend ve frontend clean build verir, uzak CI yeşildir ve ücretsiz demo URL'si üzerinde same-origin uygulama kabuğu doğrulanır.
+Repository'de belgeler ve kullanıcı tarafından oluşturulmuş çalışan solution bulunur; backend ve frontend clean build verir, uzak CI/SonarQube yeşildir. Ücretsiz demo URL ve bulut deployment provası 2026-07-08 kullanıcı kararıyla Faz 0 çıkış ölçütünden çıkarılıp sonraki faza ertelendi.
 
-## SonarQube sonrası — İlk demo deployment provası
+## Sonraki faza ertelendi — İlk demo deployment provası
 
-Bu adım yeni ürün modülü değildir; Faz 0'ın “yerelde çalışan kodu güvenli ve tekrarlanabilir biçimde yayınlama” kapanışıdır.
+Bu adım yeni ürün modülü değildir; “yerelde çalışan kodu güvenli ve tekrarlanabilir biçimde yayınlama” provasıdır. 2026-07-08 kullanıcı kararıyla aktif Faz 0 akışından çıkarıldı ve kod odaklı ilerleyişi bloke etmeyecek sonraki faz çalışması olarak saklandı.
 
 ### Planlanan çıktı
 

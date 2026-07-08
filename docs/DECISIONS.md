@@ -313,12 +313,12 @@
 ## D-030 — Ücretsiz ilk demo deployment hedefi
 
 - **Tarih:** 2026-07-05
-- **Durum:** Önerildi; bulut sağlayıcısı ve abonelik işlemi için kullanıcı onayı bekliyor
-- **Öneri:** SonarQube Cloud kurulumundan sonra ilk demo deployment, Azure App Service Free F1 üzerinde Windows code-only .NET 10 uygulaması olarak yapılacak. React production çıktısı ASP.NET Core tarafından sunulacak; API ve frontend aynı origin'i koruyacak.
+- **Durum:** Araştırma önerisi olarak saklandı; 2026-07-08 kullanıcı kararıyla uygulaması sonraki fazlara ertelendi
+- **Öneri:** İlk demo deployment zamanı geldiğinde Azure App Service Free F1 üzerinde Windows code-only .NET 10 uygulaması olarak yapılması önerilir. React production çıktısı ASP.NET Core tarafından sunulacak; API ve frontend aynı origin'i koruyacak. Bu öneri bugün kaynak açma, kurulum, abonelik veya secret oluşturma onayı değildir.
 - **Veritabanı yönü:** İlk gerçek Identity migration'ına kadar bulut veritabanı oluşturulmayacak. Gerektiğinde aynı sağlayıcıdaki Azure SQL Database Free offer kullanılacak ve kota aşımında ücretlendirme yerine ay sonuna kadar otomatik durma seçilecek.
 - **Deployment güvenliği:** İlk akış elle tetiklenecek. GitHub–Azure bağlantısında uzun ömürlü publish profile yerine OIDC/federated identity tercih edilecek. Connection string, seed parolası ve diğer production ayarları repository'de tutulmayacak.
 - **Migration:** Production migration uygulama başlangıcında otomatik çalışmayacak; üretilen SQL incelendikten sonra açık deployment adımıyla uygulanacak.
 - **Alternatifler:** Azure Container Apps Consumption teknik olarak ücretsiz kota ve scale-to-zero sağlar fakat Docker, image registry, revision ve Data Protection tasarımını erkenden getirir. Render Free kolaydır fakat servis uykuya geçer, .NET için Docker gerekir ve ücretsiz PostgreSQL 30 gün sonra sona erer; mevcut SQL Server kararını bozar veya iki sağlayıcıyı birleştirir.
 - **Sınır:** App Service F1 yalnız demo/öğrenme hedefidir; günlük 60 CPU dakikası, 165 MB bant genişliği, 1 GB depolama, tek instance ve custom-domain yokluğu gerçek işletme üretimi için yeterli kabul edilmez.
-- **Yeniden değerlendirme:** Gerçek kullanıcı, özel alan adı, SLA, daha yüksek trafik, deployment slot veya kesintisiz çalışma gerektiğinde ücretli App Service planı ya da ölçülmüş ihtiyaçla Container Apps değerlendirilir.
+- **Yeniden değerlendirme:** Deployment tekrar aktif faza alındığında güncel ücretsiz kota, otomatik ücret davranışı, veri kalıcılığı, silme/geri alma adımları ve GitHub OIDC ayrıntıları yeniden doğrulanır. Gerçek kullanıcı, özel alan adı, SLA, daha yüksek trafik, deployment slot veya kesintisiz çalışma gerektiğinde ücretli App Service planı ya da ölçülmüş ihtiyaçla Container Apps değerlendirilir.
 - **Araştırma:** `docs/RESEARCH.md` içindeki R-024.

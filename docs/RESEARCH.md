@@ -635,6 +635,11 @@ FlowLogix için seçilen başlangıç politikası:
 Taslak PR #1 açıldıktan sonra ilk Backend işi, geçişli `Microsoft.OpenApi 2.0.0` paketindeki yüksek önem dereceli güvenlik açığını warning-as-error olarak yakalayıp restore aşamasında durdu. Uyarı bastırılmadı; aynı 2.x hattındaki düzeltilmiş `2.9.0` sürümü doğrudan ve merkezi olarak sabitlendi.
 
 Yerel Release restore/build/test ve geçişli vulnerability taraması temiz tamamlandı. Düzeltme push edildikten sonraki GitHub-hosted Ubuntu koşusunda Backend `27s`, Frontend `28s` içinde geçti; başarısız veya bekleyen iş kalmadı. Böylece CI workflow'un gerçek event, Linux dosya sistemi ve temiz runner davranışı doğrulandı.
+### 2026-07-08 — FLOW-001.11d ilk remote SonarQube sonucu
+
+`dotnet-sonarscanner 11.2.1` local tool manifest ile sabitlendi ve ayrı `SonarQube` GitHub Actions workflow'u `main` push üzerinde çalıştırıldı. Run `28940499482`, commit `1af7bc7455637a79f82218df5ea9be801205d300` için `success` sonuçlandı; `.NET analysis` işi `1m54s` sürdü. Aynı push üzerindeki mevcut `CI` run `28940499475` da Backend ve Frontend işleriyle `success` sonuçlandı.
+
+İlk analiz C#/.NET kapsamında tutuldu (`sonar.scanner.scanAll=false`). Sonar annotation'ları mevcut başlangıç iskeletinden beklenen bakım girdilerini gösterdi: geçici unit/integration `Test1.cs` dosyalarında assertion yokluğu (S2699), `Program.cs` için `RunAsync` await edilmesi (S6966) ve generated `Program` sınıfına dair static/protected constructor önerisi (S1118). Ayrıca `actions/setup-java@v4.8.0` pinned sürümü Node.js 20 deprecation uyarısı verdi; Dependabot/GitHub Actions bakım politikasında izlenecek.
 
 ### 2026-07-06 — FLOW-001.11b güncel hazırlık doğrulaması
 

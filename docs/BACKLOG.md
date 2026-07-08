@@ -93,10 +93,10 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
   - [x] FLOW-001.11a — SonarQube Cloud, self-hosted Server ve GitHub-native alternatifleri karşılaştır
   - [x] FLOW-001.11b — Kullanıcı public repository'yi SonarQube Cloud'a bağlasın ve `SONAR_TOKEN` repository secret'ını oluştursun
   - [x] FLOW-001.11c — SonarScanner for .NET'i local tool manifest ile exact sürüme sabitle
-  - [ ] FLOW-001.11d — İlk aşamada C# analizini CI-based scanner ile çalıştır; token olmayan fork akışını güvenli ele al
+  - [x] FLOW-001.11d — İlk aşamada C# analizini CI-based scanner ile çalıştır; token olmayan fork akışını güvenli ele al
   - [ ] FLOW-001.11e — Sonar TypeScript 6 desteği doğrulanınca frontend multi-language analizini aç
   - [ ] FLOW-001.11f — Gerçek testler oluşunca coverage üretimini/import'unu ve quality-gate bloklamasını etkinleştir
-- [ ] FLOW-001.12 — SonarQube kurulumundan sonra ücretsiz demo deployment temelini kur
+- [ ] FLOW-001.12 — Ücretsiz demo deployment temelini kur (2026-07-08 kullanıcı kararıyla sonraki fazlara ertelendi; aktif kod akışını bloke etmez)
   - [x] FLOW-001.12a — .NET 10, React same-origin ve gelecekteki SQL Server ihtiyacı için ücretsiz hosting seçeneklerini araştır
   - [ ] FLOW-001.12b — Kullanıcı önerilen Azure hedefini ve abonelik/ücretsiz kota güvenlik sınırlarını onaylasın
   - [ ] FLOW-001.12c — React production çıktısını ASP.NET Core üzerinden same-origin sunan publish sözleşmesini kullanıcı uygulasın
@@ -115,7 +115,7 @@ Durumlar: `Bekliyor`, `Aktif`, `Kullanıcı uyguladı`, `Doğrulanıyor`, `Tamam
 - Frontend clean install ve build verir.
 - GitHub Actions aynı backend ve frontend doğrulama komutlarını çalıştırır.
 - Sonar secret'ı tracked dosyada bulunmaz; analiz kapsamı kullanılan dil sürümleriyle uyumludur.
-- İlk demo deployment aynı origin üzerinde .NET API ve React çıktısını sunar; secret tracked dosyada bulunmaz ve ücretsiz kota aşımında otomatik ücret oluşmayacak sınır seçilir.
+- İlk demo deployment kriteri 2026-07-08 kullanıcı kararıyla sonraki faza ertelendi; Faz 0 kapanışı için bulut kaynağı, secret, federated credential veya public URL beklenmeyecek.
 - Secret veya gerçek connection string tracked dosyada bulunmaz.
 - Belgeler gerçek repository durumuyla tutarlıdır.
 
